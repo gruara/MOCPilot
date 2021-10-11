@@ -1,3 +1,4 @@
+import MOCUtils
 import mysql.connector
 import datetime
 import os.path
@@ -5,9 +6,7 @@ import logging
 from time import sleep
 
 
-#schedule_date=datetime.datetime.now().strftime("%Y-%m-%d")
-
-schedule_date='2021-09-24'
+schedule_date=''
 
 cnx = mysql.connector.connect(user='awg',
                               password='iolabr0n',
@@ -26,10 +25,19 @@ def main():
     cnx.close()
     
 def initialise():
+    global schedule_date
+
     logger.info('Job Controller Starting')
     logger.info('Schedule date = {}'.format(schedule_date))
+    schedule_date=MOCUtils.schedule_date()
+    if schedule_date == 'Not defined':
+        print('Schedule date not defined')
+        sys.exit(1)
+
     
 def process():
+    global schedule_date
+
 #    time_now=datetime.datetime.now().strftime("%H:%M:%S")
     time_now='21:01:00' 
     logger.info("Checking schedule - {}".format(time_now))
@@ -85,7 +93,7 @@ def check_job_dependency(system, suite, job):
                          dep_suite,
                          dep_job,
                          met_if_not_scheduled       
-                 FROM mocp_job_dependancy
+                 FROM mocp_job_dependency
                  WHERE  system = '{}'
                     AND suite  = '{}'
                     AND job    = {}""".format(system, suite, job)    
@@ -173,7 +181,7 @@ def check_file_dependency(system, suite, job):
                          job,
                          full_path,
                          rule
-                 FROM mocp_file_dependancy
+                 FROM mocp_file_dependency
                  WHERE  system = '{}'
                     AND suite  = '{}'
                     AND job    = {}""".format(system, suite, job)    
@@ -186,7 +194,7 @@ def check_file_dependency(system, suite, job):
     dep_files=mycursor.fetchall()
     dependencies=mycursor.rowcount
     dep_met=0
-    print(dependencies, dep_met)
+#    print(dependencies, dep_met)
     if mycursor.rowcount == 0:
         pass
     else:

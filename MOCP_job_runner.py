@@ -1,7 +1,7 @@
 #
 # This script needs to be executed using python3 rather than python which by default uses python2 as python2
 # does not support the run method of subprocess
-
+import MOCUtils
 import threading
 import subprocess
 import mysql.connector
@@ -22,9 +22,7 @@ logger=logging.getLogger('MOCP Job Runner')
 
 
 
-#schedule_date=datetime.datetime.now().strftime("%Y-%m-%d")
-
-schedule_date='2021-09-24'
+schedule_date=''
 
 active_threads=[]
 
@@ -39,11 +37,17 @@ def main():
     cnx.close()
     
 def initialise():
+    global schedule_date
     logger.info('Job Runner Starting')
     logger.info('Schedule date = {}'.format(schedule_date))
-
+    schedule_date=MOCUtils.schedule_date()
+    if schedule_date == 'Not defined':
+        print('Schedule date not defined')
+        sys.exit(1)
     
 def process():
+    global schedule_date
+
     mycursor= cnx.cursor()
 # TO DO - select doesn't work for non standard schedule daya eg 06:00 to 05:59, jobs
 #         with a schedule time 00:00 to 05:59 will be picked up previous day!
@@ -65,7 +69,7 @@ def process():
         logger.error(err)
 
     jobs=mycursor.fetchall()
-    print(mycursor.rowcount)
+#    print(mycursor.rowcount)
     cnx.commit()
     for i in jobs:
         if active_threads.count('')<4:

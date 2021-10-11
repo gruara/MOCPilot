@@ -9,215 +9,258 @@ import MOCPsettings
 from flask import (Flask, request, jsonify)
 
 
-cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                              password=MOCPsettings.DB_PASSWORD,
-                              host='localhost',
-                              database='MOCpilot')
+
 logging.basicConfig(level=logging.DEBUG,
                     filename='/home/pi/log/MOCP_Web_Services.log',filemode='a',
                     format='%(asctime)s - %(name)s - %(threadName)s %(levelname)s: %(message)s')
 logger=logging.getLogger('MOCP Web Services')
-logger.info('Job Runner Starting')
+logger.info('Web Services Starting')
 
 app=Flask("MOCP_web_services")
 
 token=''
 
-@app.route("/api/v1.0/MOCP/user", methods=['GET', 'PUT'])
-def login():
-    global token
-    sys_message = 'None'
-    payload=request.get_json()
-    if not payload:
-        response = 400
-    else:
-        user=payload.get('user_id')
-        password=payload.get('password')
-        new_password=payload.get('new_password')
-        if request.method == 'GET' and user and password and not new_password:
-        
-            logger.info('Log in request')
-            response, sys_message=login_user(user, password)
-        elif request.method == 'PUT' and user and password and new_password:
-            logger.info('Change password request')
-            response, sys_message=change_password(user, password, new_password)
-        else:
+
+@app.route("/api/v1.0/MOCP/job", methods=['POST'])
+def insert_jobs():
+    logger.info('Insert Jobs')
+    sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    if not authorised():
+        sys_message='Invalid token or token expired'
+        response = 403
+    else:    
+        jobs=request.get_json()
+        if not jobs:
             response = 400
-            
+        else:
+            insert=''
+            comma=''
+            for job in jobs:
+                insert="""{} {} (0, '{}' , '{}', {}, '{}', '{}', '{}', "{}" , '2000-01-01' )""".format(insert,
+                                                                                               comma,
+                                                                                               job['system'],
+                                                                                               job['suite'],
+                                                                                               job['job'],
+                                                                                               job['description'],
+                                                                                               job['schedule_scheme'],
+                                                                                               job['schedule_time'],
+                                                                                               job['command_line'])
+                comma=','
+
+            sql = """INSERT INTO `mocp_job`(`id`,
+                                            `system`,
+                                            `suite`,
+                                            `job`,
+                                            `description`,
+                                            `schedule_scheme`,
+                                            `schedule_time`,
+                                            `command_line`,
+                                            `last_scheduled`) 
+                     VALUES {}""".format(insert)
+            try:
+                mycursor=cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.IntegrityError as err:
+                sys_message='Request contains duplicates - no records inserted'
+                response = 409
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                cnx.commit()
+                sys_message='Records inserted'
+                response = 200
+    reply=response_message(response, sys_message)        
+
+    return jsonify(reply), response
+
+
+@app.route("/api/v1.0/MOCP/job_dependency", methods=['POST'])
+def insert_jobdependency():
+    logger.info('Insert Job Dependencies')
+    sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    if not authorised():
+        sys_message='Invalid token or token expired'
+        response = 403
+    else:    
+        dependencies=request.get_json()
+        if not dependencies:
+            response = 400
+        else:
+            insert=''
+            comma=''
+            for dependency in dependencies:
+                insert="""{} {} (0, '{}' , '{}', {}, '{}', '{}', {}, "{}" , '{}' )""".format(  insert,
+                                                                                               comma,
+                                                                                               dependency['system'],
+                                                                                               dependency['suite'],
+                                                                                               dependency['job'],
+                                                                                               dependency['dep_system'],
+                                                                                               dependency['dep_suite'],
+                                                                                               dependency['dep_job'],
+                                                                                               dependency['dep_type'],
+                                                                                               dependency['met_if_not_scheduled'])
+                comma=','
+
+            sql = """INSERT INTO `mocp_job_dependency`(`id`,
+                                                       `system`,
+                                                       `suite`,
+                                                       `job`,
+                                                       `dep_system`,
+                                                       `dep_suite`,
+                                                       `dep_job`,
+                                                       `dep_type`,
+                                                       `met_if_not_scheduled`)
+                     VALUES {}""".format(insert)
+            try:
+                mycursor=cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.IntegrityError as err:
+                sys_message='Request contains duplicates - no records inserted'
+                response = 409
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                cnx.commit()
+                sys_message='Records inserted'
+                response = 200
+    reply=response_message(response, sys_message)        
+
+    return jsonify(reply), response
+
+@app.route("/api/v1.0/MOCP/log", methods=['POST'])
+def insert_log(): 
+    logger.info('Insert log') 
+    sys_message='None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    if not authorised():
+        sys_message='Invalid token or token expired'
+        response = 403
+    else:    
+        payload=request.get_json()
+        if not payload:
+            response = 400
+        else:
+            system=payload.get('system')
+            suite=payload.get('suite')
+            job=payload.get('job')
+            job_id=payload.get('job_id')
+            action=payload.get('action')
+            schedule_date=payload.get('schedule_date')
+            schedule_status=payload.get('schedule_status')
+            mycursor=cnx.cursor()
+            sql = """INSERT INTO `mocp_log` (       `system`,
+                                                    `suite`,
+                                                    `job`,
+                                                    `job_id`,
+                                                    `action`,
+                                                    `schedule_date`,
+                                                    `schedule_status`)
+                                             
+                     VALUES ('{}', '{}', '{}', {}, '{}', '{}', '{}')""".format(
+                             system, suite, job, job_id ,action , schedule_date, schedule_status)
+            try:
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+
+                if mycursor.rowcount == 1:
+                    sys_message='Log entry inserted'
+                    response = 201       
+                    cnx.commit()
+                else:
+                    sys_message='Unknown error'
+                    response = 500
+        
+    reply=response_message(response, sys_message)        
+
+    return jsonify(reply), response  
+    
+    
+@app.route("/api/v1.0/MOCP/schedule_date", methods=['GET'])
+def get_schedule_date():
+    logger.info('Get Schedule date')
+    sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    mycursor=cnx.cursor()
+    sql = """SELECT * FROM `mocp_schedule` WHERE 1"""
+
+    try:
+        mycursor.execute(sql)
+        rec=mycursor.fetchone()
+
+    except mysql.connector.Error as err:
+        logger.error(sql)
+        logger.error(err)
+        response = 500
+    else:
+        if mycursor.rowcount == 1:
+            schedule_date=str(rec[1])
+            response = 200
+        else:
+            sys_message='Unknown error'
+            response = 404
     if response == 200:
         return_payload = {'payload' : {
-                        'token' : token
+                        'schedule_date' : schedule_date
                         }}
         reply = {'http_reply' :{
                     'http_code' : 200,
                     'http_message' : 'Success',
                     'system_message' : sys_message}}
-        return jsonify(return_payload, reply), response
+        return jsonify(return_payload, reply), 200 
     else:
         reply=response_message(response, sys_message)        
-
         return jsonify(reply), response
-        
-def login_user(user, password):
-    global token
-    mycursor= cnx.cursor()
-
-    sql = """SELECT user_id, password FROM mocp_user WHERE user_id = '{}'""".format(user.lower())
-    try:
-        mycursor.execute(sql)
-    except mysql.connector.Error as err:
-        logger.error(sql)
-        logger.error(err)
- 
-        return 500, 'None'
-    rec=mycursor.fetchone()
-    if mycursor.rowcount < 1:
-        return 404, 'Invalid user/password'
-    rec_user, rec_password=rec
-
-    in_password=password.encode()
-    h = hashlib.new('sha512-256')   
-    h.update(in_password)
-    hash=h.hexdigest()
-
-    if hash != rec_password:
-        return 404, 'Invalid user/password'
-    token = uuid.uuid4()
-    token_expiry = datetime.datetime.now() + \
-                        datetime.timedelta(minutes=MOCPsettings.TOKEN_EXPIRY)
-
-    sql = """UPDATE mocp_user set token = '{}', token_expiry = '{}' WHERE user_id = '{}'""".format(token, token_expiry, user.lower())
-    try:
-        mycursor.execute(sql)
-    except mysql.connector.Error as err:
-        logger.error(sql)
-        logger.error(err)
-        return 500, 'None'
 
 
-    cnx.commit()
-    return 200, 'Logged in'
-    
-def change_password(user, password, new_password):
-    global token
-    mycursor= cnx.cursor()
-
-    sql = """SELECT user_id, password FROM mocp_user WHERE user_id = '{}'""".format(user.lower())
-    try:
-        mycursor.execute(sql)
-    except mysql.connector.Error as err:
-        logger.error(sql)
-        logger.error(err)
- 
-        return 500, 'None'
-    rec=mycursor.fetchone()
-    if mycursor.rowcount < 1:
-        return 404, 'Invalid user/password'
-
-    rec_user, rec_password=rec
-
-    if password != 'NULL':
-        in_password=password.encode()
-        h = hashlib.new('sha512-256')   
-        h.update(in_password)
-        hash=h.hexdigest()
-
-        if hash != rec_password:
-            return 404,'Invalid user/password'
-    else:
-        if rec_password != '':
-        
-            return 505, 'None'
-            
-    in_new_password=new_password.encode()
-    h = hashlib.new('sha512-256')   
-    h.update(in_new_password)
-    new_hash=h.hexdigest()
-    token = uuid.uuid4()
-    token_expiry = datetime.datetime.now() + \
-                        datetime.timedelta(minutes=MOCPsettings.TOKEN_EXPIRY)
-                        
-    sql = """UPDATE mocp_user set password= '{}', token = '{}', token_expiry = '{}' WHERE user_id = '{}'""".format(new_hash, token, token_expiry, user.lower())
-    try:
-  
-        mycursor.execute(sql)
-    except mysql.connector.Error as err:
-        logger.error(sql)
-        logger.error(err)
-        return 500, 'None'
-
-
-    cnx.commit()
-    return 200, 'Password Changed'
-    
-@app.route("/api/v1.0/MOCP/user", methods=['POST'])
-def new_user(): 
-    logger.info('Insert user') 
-    sys_message='None'
-    if not authorised():
-        sys_message='Invalid token or token expired'
-        response = 403
-    else:    
-        payload=request.get_json()
-        if not payload:
-            response = 400
-        else:
-            user_id=payload.get('user_id')
-            name=payload.get('name')
-            if not user_id or not name:
-                response = 400
-            else:
-                create_date=datetime.datetime.now().strftime("%Y-%m-%d")
-                token=uuid.uuid4()
-                token_expiry='2000-01-01 00:00:01'
-                mycursor=cnx.cursor()
-                sql = """INSERT INTO `mocp_user`(`user_id`,
-                                                 `name`, 
-                                                 `created_on`, 
-                                                 `password`, 
-                                                 `token`, 
-                                                 `token_expiry`) 
-                            VALUES ('{}', '{}', '{}', '{}', '{}', '{}')""".format(user_id.lower(), name, create_date, '', token, token_expiry)
-                try:
-                    mycursor.execute(sql)
-                except mysql.connector.IntegrityError as err:
-                    sys_message='User already exists'
-                    response = 409
-                except mysql.connector.Error as err:
-                    logger.error(sql)
-                    logger.error(err)
-                    response = 500
-                else:
-
-                    if mycursor.rowcount == 1:
-                        sys_message='User inserted'
-                        response = 201       
-                        cnx.commit()
-                    else:
-                        sys_message='Unknown error'
-                        response = 500
-        
-    reply=response_message(response, sys_message)        
-
-    return jsonify(reply), response  
-
-    
 @app.route("/api/v1.0/MOCP/schedule_job", methods=['GET'])
 def schedule_jobs():
     logger.info('Get Schedule Jobs')
     sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
     if not authorised():
         sys_message='Invalid token or token expired'
         response = 403
     else:    
-        payload=request.get_json()
-        if not payload:
+        req_payload=request.get_json()
+        if not req_payload:
             response = 400
         else:
-            system= payload.get('system')
-            suite=payload.get('suite')
-            job=payload.get('job')
-            schedule_date=payload.get('schedule_date')
+            system= req_payload.get('system')
+            suite=req_payload.get('suite')
+            job=req_payload.get('job')
+            schedule_date=req_payload.get('schedule_date')
             
             if not schedule_date:
                 sys_message='Schedule date must be supplied'
@@ -270,14 +313,21 @@ def schedule_jobs():
                                 'http_message' : 'Success',
                                 'system_message' : sys_message}}
                         return jsonify(return_payload, reply), response
+    cnx.commit()
     reply=response_message(response, sys_message)        
     return jsonify(reply), response    
+
 
 
 @app.route("/api/v1.0/MOCP/schedule_job", methods=['PUT'])
 def schedule_job():
     logger.info('Update Schedule Job Status {}')
     sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
     if not authorised():
         sys_message='Invalid token or token expired'
         response = 403
@@ -335,62 +385,204 @@ def schedule_job():
 
     return jsonify(reply), response
     
-@app.route("/api/v1.0/MOCP/job", methods=['POST'])
+    
+@app.route("/api/v1.0/MOCP/user", methods=['GET', 'PUT'])
+def login():
+    global token
+    sys_message = 'None'
+    payload=request.get_json()
+    if not payload:
+        print('No Json')
+        response = 400
+    else:
+        user=payload.get('user_id')
+        password=payload.get('password')
+        new_password=payload.get('new_password')
+        if request.method == 'GET' and user and password and not new_password:
+        
+            logger.info('Log in request')
+            response, sys_message=login_user(user, password)
+        elif request.method == 'PUT' and user and password and new_password:
+            logger.info('Change password request')
+            response, sys_message=change_password(user, password, new_password)
+        else:
+            response = 400
+            
+    if response == 200:
+        return_payload = {'payload' : {
+                        'token' : token
+                        }}
+        reply = {'http_reply' :{
+                    'http_code' : 200,
+                    'http_message' : 'Success',
+                    'system_message' : sys_message}}
+        return jsonify(return_payload, reply), response
+    else:
+        reply=response_message(response, sys_message)        
+
+        return jsonify(reply), response
+
+        
+def login_user(user, password):
+    global token
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    mycursor= cnx.cursor()
+
+    sql = """SELECT user_id, password FROM mocp_user WHERE user_id = '{}'""".format(user.lower())
+    try:
+        mycursor.execute(sql)
+    except mysql.connector.Error as err:
+        logger.error(sql)
+        logger.error(err)
+ 
+        return 500, 'None'
+    rec=mycursor.fetchone()
+    if mycursor.rowcount < 1:
+        return 404, 'Invalid user/password'
+    rec_user, rec_password=rec
+
+    in_password=password.encode()
+    h = hashlib.new('sha512-256')   
+    h.update(in_password)
+    hash=h.hexdigest()
+
+    if hash != rec_password:
+        return 404, 'Invalid user/password'
+    token = uuid.uuid4()
+    token_expiry = datetime.datetime.now() + \
+                        datetime.timedelta(minutes=MOCPsettings.TOKEN_EXPIRY)
+
+    sql = """UPDATE mocp_user set token = '{}', token_expiry = '{}' WHERE user_id = '{}'""".format(token, token_expiry, user.lower())
+    try:
+        mycursor.execute(sql)
+    except mysql.connector.Error as err:
+        logger.error(sql)
+        logger.error(err)
+        return 500, 'None'
 
 
-def insert_jobs():
-    logger.info('Insert Jobs')
-    sys_message= 'None'
+    cnx.commit()
+    return 200, 'Logged in'
+
+    
+def change_password(user, password, new_password):
+    global token
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    mycursor= cnx.cursor()
+
+    sql = """SELECT user_id, password FROM mocp_user WHERE user_id = '{}'""".format(user.lower())
+    try:
+        mycursor.execute(sql)
+    except mysql.connector.Error as err:
+        logger.error(sql)
+        logger.error(err)
+ 
+        return 500, 'None'
+    rec=mycursor.fetchone()
+    if mycursor.rowcount < 1:
+        return 404, 'Invalid user/password'
+
+    rec_user, rec_password=rec
+
+    if password != 'NULL':
+        in_password=password.encode()
+        h = hashlib.new('sha512-256')   
+        h.update(in_password)
+        hash=h.hexdigest()
+
+        if hash != rec_password:
+            return 404,'Invalid user/password'
+    else:
+        if rec_password != '':
+        
+            return 505, 'None'
+            
+    in_new_password=new_password.encode()
+    h = hashlib.new('sha512-256')   
+    h.update(in_new_password)
+    new_hash=h.hexdigest()
+    token = uuid.uuid4()
+    token_expiry = datetime.datetime.now() + \
+                        datetime.timedelta(minutes=MOCPsettings.TOKEN_EXPIRY)
+                        
+    sql = """UPDATE mocp_user set password= '{}', token = '{}', token_expiry = '{}' WHERE user_id = '{}'""".format(new_hash, token, token_expiry, user.lower())
+    try:
+  
+        mycursor.execute(sql)
+    except mysql.connector.Error as err:
+        logger.error(sql)
+        logger.error(err)
+        return 500, 'None'
+
+
+    cnx.commit()
+    return 200, 'Password Changed'
+
+    
+@app.route("/api/v1.0/MOCP/user", methods=['POST'])
+def new_user(): 
+    logger.info('Insert user') 
+    sys_message='None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
     if not authorised():
         sys_message='Invalid token or token expired'
         response = 403
     else:    
-        jobs=request.get_json()
-        if not jobs:
+        payload=request.get_json()
+        if not payload:
             response = 400
         else:
-            insert=''
-            comma=''
-            for job in jobs:
-                insert="""{} {} (0, '{}' , '{}', {}, '{}', '{}', '{}', "{}" , '2000-01-01' )""".format(insert,
-                                                                                               comma,
-                                                                                               job['system'],
-                                                                                               job['suite'],
-                                                                                               job['job'],
-                                                                                               job['description'],
-                                                                                               job['schedule_scheme'],
-                                                                                               job['schedule_time'],
-                                                                                               job['command_line'])
-                comma=','
-
-            sql = """INSERT INTO `mocp_job`(`id`,
-                                            `system`,
-                                            `suite`,
-                                            `job`,
-                                            `description`,
-                                            `schedule_scheme`,
-                                            `schedule_time`,
-                                            `command_line`,
-                                            `last_scheduled`) 
-                     VALUES {}""".format(insert)
-            try:
-                mycursor=cnx.cursor()
-
-                mycursor.execute(sql)
-            except mysql.connector.IntegrityError as err:
-                sys_message='Request contains duplicates - no records inserted'
-                response = 409
-            except mysql.connector.Error as err:
-                logger.error(sql)
-                logger.error(err)
-                response = 500
+            user_id=payload.get('user_id')
+            name=payload.get('name')
+            if not user_id or not name:
+                response = 400
             else:
-                cnx.commit()
-                sys_message='Records inserted'
-                response = 200
+                create_date=datetime.datetime.now().strftime("%Y-%m-%d")
+                token=uuid.uuid4()
+                token_expiry='2000-01-01 00:00:01'
+                mycursor=cnx.cursor()
+                sql = """INSERT INTO `mocp_user`(`user_id`,
+                                                 `name`, 
+                                                 `created_on`, 
+                                                 `password`, 
+                                                 `token`, 
+                                                 `token_expiry`) 
+                            VALUES ('{}', '{}', '{}', '{}', '{}', '{}')""".format(user_id.lower(), name, create_date, '', token, token_expiry)
+                try:
+                    mycursor.execute(sql)
+                except mysql.connector.IntegrityError as err:
+                    sys_message='User already exists'
+                    response = 409
+                except mysql.connector.Error as err:
+                    logger.error(sql)
+                    logger.error(err)
+                    response = 500
+                else:
+
+                    if mycursor.rowcount == 1:
+                        sys_message='User inserted'
+                        response = 201       
+                        cnx.commit()
+                    else:
+                        sys_message='Unknown error'
+                        response = 500
+        
     reply=response_message(response, sys_message)        
 
-    return jsonify(reply), response
+    return jsonify(reply), response  
+
 
 def response_message(response, sys_message='None'):
     if response == 200:
@@ -439,6 +631,10 @@ def authorised():
     in_token=request.headers.get('token')
     if not user or not in_token:
         return False
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
         
     mycursor= cnx.cursor()
 

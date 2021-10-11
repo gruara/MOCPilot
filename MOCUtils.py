@@ -1,5 +1,8 @@
 import calendar
 import datetime
+import MOCPsettings
+import mysql.connector
+import requests
 
 days=["MON","TUE","WED","THU","FRI","SAT","SUN"]
 days_month=[31,28,31,30,31,30,31,31,30,31,30,31]
@@ -42,3 +45,47 @@ def date_properties(date):
         properties.append(property)
         
     return properties
+    
+def get_schedule_date():
+    url = 'http://192.168.68.133:5000/api/v1.0/MOCP/schedule_date'
+
+    try:
+        r = requests.get(url)
+    except:
+        print('Commuication error')
+    else:
+        if r.status_code == 200:
+            resp = r.json()
+            payload=resp[0]
+            body=payload['payload']
+            schedule_date = body['schedule_date']
+            return str(schedule_date)
+        else:
+            return 'Not defined'
+
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+                                  
+def insert_log_entry(entry, user, token):
+
+    url='http://192.168.68.133:5000/api/v1.0/MOCP/log'
+    headers = {'user_id' : user,
+               'token' : token}
+
+    payload = {'system' : entry['system'],
+               'suite': entry['suite'],
+               'job' : entry['job'],
+               'job_id' : entry['job_id'],
+               'action' : entry['action'],
+               'schedule_date': entry['schedule_date'],
+               'schedule_status' : entry['schedule_status']}
+    try:
+        r = requests.post(url, headers=headers, json=payload)
+    except:
+        print('Commuication error')
+        return 500
+    else:
+        return 201
+
