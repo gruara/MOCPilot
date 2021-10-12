@@ -1,8 +1,9 @@
-import MOCUtils
+
 import logging
 import requests
 import json
 from time import sleep
+
 
 #schedule_date=datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -76,9 +77,7 @@ def process():
     headers = {'user_id' : user_id,
                'token' : token}
 
-    payload = {'system' : 'CRED',
-               'suite': 'DAY',
-               'schedule_date': schedule_date}
+    payload = {'schedule_date': schedule_date}
     try:
         r = requests.get(url, headers=headers, json=payload)
     except:
