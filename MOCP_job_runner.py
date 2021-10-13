@@ -109,7 +109,7 @@ def run_job(cnx):
                                          `schedule_status`)
                                              
                      VALUES ('{}', '{}', '{}', {}, '{}', '{}', '{}')""".format(
-                             job_dets['system'], job_dets['suite'], job_dets['job'], 0 ,'Dependencies met' , job_dets['schedule_date'], 'RS')
+                             job_dets['system'], job_dets['suite'], job_dets['job'], 0 ,'Job started' , job_dets['schedule_date'], 'RS')
         try:
             mycursor.execute(sql)
         except mysql.connector.Error as err:
@@ -187,7 +187,22 @@ def thread_run_job(system, suite, job, thread):
             logger.error(sql)
             logger.error(err)
             sys.exit(1)
- 
+        else:
+            sql = """INSERT INTO `mocp_log` (`system`,
+                                         `suite`,
+                                         `job`,
+                                         `job_id`,
+                                         `action`,
+                                         `schedule_date`,
+                                         `schedule_status`)
+                                             
+                     VALUES ('{}', '{}', '{}', {}, 'Job {}', '{}', '{}')""".format(
+                             system, suite, job, 0 ,action , schedule_date, status)
+            try:
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
     cnx.commit()
     active_threads.remove(int(thread))
 

@@ -21,7 +21,8 @@ app=Flask("MOCP_web_services")
 token=''
 
 
-@app.route("/api/v1.0/MOCP/job", methods=['POST'])
+#@app.route("/api/v1.0/MOCP/job", methods=['POST'])
+@app.route("/job", methods=['POST'])
 def insert_jobs():
     logger.info('Insert Jobs')
     sys_message= 'None'
@@ -82,7 +83,7 @@ def insert_jobs():
     return jsonify(reply), response
 
 
-@app.route("/api/v1.0/MOCP/job_dependency", methods=['POST'])
+@app.route("/job_dependency", methods=['POST'])
 def insert_jobdependency():
     logger.info('Insert Job Dependencies')
     sys_message= 'None'
@@ -143,7 +144,7 @@ def insert_jobdependency():
 
     return jsonify(reply), response
 
-@app.route("/api/v1.0/MOCP/log", methods=['POST'])
+@app.route("/log", methods=['POST'])
 def insert_log(): 
     logger.info('Insert log') 
     sys_message='None'
@@ -199,7 +200,7 @@ def insert_log():
     return jsonify(reply), response  
     
     
-@app.route("/api/v1.0/MOCP/schedule_date", methods=['GET'])
+@app.route("/schedule_date", methods=['GET'])
 def get_schedule_date():
     logger.info('Get Schedule date')
     sys_message= 'None'
@@ -240,7 +241,7 @@ def get_schedule_date():
         return jsonify(reply), response
 
 
-@app.route("/api/v1.0/MOCP/schedule_job", methods=['GET'])
+@app.route("/schedule_job", methods=['GET'])
 def schedule_jobs():
     logger.info('Get Schedule Jobs')
     sys_message= 'None'
@@ -319,7 +320,7 @@ def schedule_jobs():
 
 
 
-@app.route("/api/v1.0/MOCP/schedule_job", methods=['PUT'])
+@app.route("/schedule_job", methods=['PUT'])
 def schedule_job():
     logger.info('Update Schedule Job Status {}')
     sys_message= 'None'
@@ -386,7 +387,7 @@ def schedule_job():
     return jsonify(reply), response
     
     
-@app.route("/api/v1.0/MOCP/user", methods=['GET', 'PUT'])
+@app.route("/user", methods=['GET', 'PUT'])
 def login():
     global token
     sys_message = 'None'
@@ -527,7 +528,7 @@ def change_password(user, password, new_password):
     return 200, 'Password Changed'
 
     
-@app.route("/api/v1.0/MOCP/user", methods=['POST'])
+@app.route("/user", methods=['POST'])
 def new_user(): 
     logger.info('Insert user') 
     sys_message='None'
@@ -627,9 +628,14 @@ def response_message(response, sys_message='None'):
     return reply
 
 def authorised():
-    user=request.headers.get('user_id')
+#
+#   header id changed from user_id to user as underscore caused header to be ignored by Apache wsgi
+#
+    user=request.headers.get('user')
+    logger.info("test")
     in_token=request.headers.get('token')
     if not user or not in_token:
+        logger.info("No user or token")
         return False
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -648,15 +654,18 @@ def authorised():
         return False
     rec=mycursor.fetchone()
     if mycursor.rowcount < 1:
+        logger.info("No user rec returned")
         return False
 
     rec_user, rec_token, rec_token_expiry=rec
 
     if in_token != rec_token:
+        logger.info("Token does not match")
         return False
     
     
     if datetime.datetime.now() > rec_token_expiry:
+        logger.info("Token expired")
         return False
     
     return True
