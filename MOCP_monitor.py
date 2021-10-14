@@ -30,7 +30,7 @@ def main():
 
 def initialise():
     global token, url, headers, payload, schedule_date
-    url = 'http://192.168.68.133:5000/api/v1.0/MOCP/schedule_date'
+    url = 'http://192.168.68.133:80/api/v1.0/MOCPilot/schedule_date'
 
     try:
         r = requests.get(url)
@@ -48,7 +48,7 @@ def initialise():
             sys.exit(1)
 
     logged_in = False
-    url = 'http://192.168.68.133:5000/api/v1.0/MOCP/user'
+    url = 'http://192.168.68.133:80/api/v1.0/MOCPilot/user'
     payload = {'user_id' : 'andrew@gruar.co.uk',
                'password': 'dogs are best'}
     try:
@@ -73,8 +73,8 @@ def process():
 
 # for some reason the following lines do not work if done prior to process interation
 
-    url='http://192.168.68.133:5000/api/v1.0/MOCP/schedule_job'
-    headers = {'user_id' : user_id,
+    url='http://192.168.68.133:80/api/v1.0/MOCPilot/schedule_job'
+    headers = {'user' : user_id,
                'token' : token}
 
     payload = {'schedule_date': schedule_date}

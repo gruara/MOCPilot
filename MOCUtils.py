@@ -47,7 +47,7 @@ def date_properties(date):
     return properties
     
 def get_schedule_date():
-    url = 'http://192.168.68.133:5000/api/v1.0/MOCP/schedule_date'
+    url = 'http://192.168.68.133:80/api/v1.0/MOCPilot/schedule_date'
 
     try:
         r = requests.get(url)
