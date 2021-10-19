@@ -1,6 +1,7 @@
-import MOCUtils
+#import MOCUtils
 import mysql.connector
 import subprocess
+from MOCUtils import get_schedule_date, date_properties, insert_log_entry
 
 
 cnx = mysql.connector.connect(user='awg',
@@ -8,7 +9,15 @@ cnx = mysql.connector.connect(user='awg',
                               host='localhost',
                               database='MOCpilot')
 def main():
-    sub_process()
+    schedule_date='2021-01-01'
+
+    properties=date_properties( schedule_date)
+    print(properties)
+
+
+
+
+#    sub_process()
 
 def insert_jobs():
     mycursor =cnx.cursor()

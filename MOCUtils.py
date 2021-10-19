@@ -5,16 +5,26 @@ import mysql.connector
 import requests
 
 days=["MON","TUE","WED","THU","FRI","SAT","SUN"]
+months=["","JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"]
 days_month=[31,28,31,30,31,30,31,31,30,31,30,31]
+
 
 def date_properties(date):
     properties=['EVERYDAY']
+    
+    properties.append(date)
     
     in_date=datetime.datetime.strptime(date, "%Y-%m-%d")
     property="DAY" + str(in_date.day)
     properties.append(property)
     
     property="MONTH" + str(in_date.month)
+    properties.append(property)
+    
+    property=months[in_date.month]
+    properties.append(property)
+    
+    property="{}{}".format(months[in_date.month],str(in_date.day))
     properties.append(property)
     
     property=days[in_date.weekday()]
@@ -43,12 +53,44 @@ def date_properties(date):
     if  in_date.day > no_days - 7 :
         property="LAST" + days[in_date.weekday()]
         properties.append(property)
+        if days[in_date.weekday()] == 'SUN':
+            if int(in_date.month) == 3:
+                properties.append("BSTSTART")
+            elif int(in_date.month) == 10:
+                properties.append("BSTEND")
+#    problems processing json for below url                
+#    url = 'https://www.gov.uk/bank-holidays.json'
+    
+    url = 'https://date.nager.at/api/v3/publicholidays/{}/GB'.format(in_date.year) 
+    try:
+        r = requests.get(url)
+    except:
+        print('Commuication error')
+    else:
+        resp=[]
+        resp = r.json()
+        for bh in resp:
+            if date == bh['date']:
+                if not bh['counties']:
+                    properties.extend(["BHOLEW","BHOLSC","BHOLNI"])
+                else:
+                    regions = bh['counties']
+                    for region in regions:
+                        if region == 'GB-SCT':
+                            properties.append("BHOLSC")
+                        elif region == 'GB-NIR':
+                            properties.append("BHOLNI")
+                        elif region == 'GB-ENG':
+                            properties.append("BHOLEW")
+ 
         
     return properties
     
 def get_schedule_date():
+
     url = 'http://192.168.68.133:80/api/v1.0/MOCPilot/schedule_date'
 
+     
     try:
         r = requests.get(url)
     except:
