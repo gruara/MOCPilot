@@ -59,7 +59,11 @@ def process():
                          system,
                          suite,
                          job,
-                         schedule_scheme,
+                         run_on,
+                         or_run_on,
+                         or_run_on2,
+                         but_not_on,
+                         and_not_on,
                          schedule_time,
                          last_scheduled       
                  FROM mocp_job
@@ -78,75 +82,62 @@ def process():
              job_system,
              job_suite,
              job,
-             job_scheme,
+             job_run_on,
+             job_or_run_on,
+             job_or_run_on2,
+             job_but_not_on,
+             job_and_not_on,
              job_time,
              job_last_scheduled
                                 ) in jobs:
-#            print(job)
-            if job_scheme in properties:
-                sql = """INSERT INTO `mocp_schedule_job` (  `id`,
-                                                            `system`,
-                                                            `suite`,
-                                                            `job`,
-                                                            `status`,
-                                                            `schedule_date`,
-                                                            `schedule_time`)
-                                                         
-                         VALUES ({}, '{}', '{}', {}, '{}', '{}', '{}')""".format(
-                                0, job_system, job_suite, job, "SQ", schedule_date, job_time)
-                
-                logger.info("Inserting {}".format(job))
-                try:
-                    mycursor.execute(sql)
-                except mysql.connector.Error as err:
-                    logger.error(sql)
-                    logger.error(err)
-                    sys.exit(1)
-                else:    
-                    sql = """INSERT INTO `mocp_log` (       `system`,
-                                                            `suite`,
-                                                            `job`,
-                                                            `job_id`,
-                                                            `action`,
-                                                            `schedule_date`,
-                                                            `schedule_status`)
-                                                     
-                             VALUES ('{}', '{}', '{}', {}, '{}', '{}', '{}')""".format(
-                                     job_system, job_suite, job, job_id ,'Added to schedule' , schedule_date, 'SQ')
-
+            if not (job_but_not_on in properties) and not (job_and_not_on in properties):
+                if (job_run_on in properties) or (job_or_run_on in properties) or (job_or_run_on2 in properties):
+                    sql = """INSERT INTO `mocp_schedule_job` (  `id`,
+                                                                `system`,
+                                                                `suite`,
+                                                                `job`,
+                                                                `status`,
+                                                                `schedule_date`,
+                                                                `schedule_time`)
+                                                             
+                             VALUES ({}, '{}', '{}', {}, '{}', '{}', '{}')""".format(
+                                    0, job_system, job_suite, job, "SQ", schedule_date, job_time)
+                    
+                    logger.info("Inserting {}".format(job))
                     try:
                         mycursor.execute(sql)
                     except mysql.connector.Error as err:
                         logger.error(sql)
                         logger.error(err)
                         sys.exit(1)
-                    else:
-                        sql = """UPDATE mocp_job set last_scheduled = '{}' WHERE id = {}""".format(schedule_date, job_id)
+                    else:    
+                        sql = """INSERT INTO `mocp_log` (       `system`,
+                                                                `suite`,
+                                                                `job`,
+                                                                `job_id`,
+                                                                `action`,
+                                                                `schedule_date`,
+                                                                `schedule_status`)
+                                                         
+                                 VALUES ('{}', '{}', '{}', {}, '{}', '{}', '{}')""".format(
+                                         job_system, job_suite, job, job_id ,'Added to schedule' , schedule_date, 'SQ')
+
                         try:
                             mycursor.execute(sql)
                         except mysql.connector.Error as err:
                             logger.error(sql)
                             logger.error(err)
                             sys.exit(1)
+                        else:
+                            sql = """UPDATE mocp_job set last_scheduled = '{}' WHERE id = {}""".format(schedule_date, job_id)
+                            try:
+                                mycursor.execute(sql)
+                            except mysql.connector.Error as err:
+                                logger.error(sql)
+                                logger.error(err)
+                                sys.exit(1)
 
 
-            # log= {  'system' : job_system,
-                    # 'suite' : job_suite,
-                    # 'job' : job,
-                    # 'job_id' : 0,
-                    # 'action' : 'Added to schedule',
-                    # 'schedule_date': schedule_date,
-                    # 'schedule_status' : 'SQ'}
-            
-         
-            # result=insert_log_entry(log, MOCPsettings.system_user_id, MOCPsettings.system_token)
-              
-            # sql = """UPDATE mocp_job set last_scheduled = '{}' WHERE id = {}""".format(schedule_date, job_id)
-            # try:
-                # mycursor.execute(sql)
-            # except mysql.connector.Error as err:
-                # logger.error(sql)
-                # logger.error(err)
        
 
     cnx.commit()
