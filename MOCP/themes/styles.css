@@ -1,0 +1,35 @@
+h1 {
+  font-family:Calibri;	
+  text-align: left;
+  font-size: 42;
+  color:#8FAADC;
+  background-color:#f9f9f9;
+  margin:0;
+
+}
+h2 {
+  font-family:Calibri;	
+  text-align: left;
+  font-size: 18;
+  color:#8FAADC;
+  background-color:#f9f9f9;
+  margin:0;
+
+}
+p {
+  font-family:Calibri;	
+  text-align: left;
+  font-size: 14;
+  color:blue;
+  background-color:#f9f9f9;
+  margin:0;
+}
+span {
+  color: red;
+} 
+.mocpMenu {
+  color:#483D8B;
+  background-color:#f9f9f9;
+  margin:0;
+  font-size:13
+}		

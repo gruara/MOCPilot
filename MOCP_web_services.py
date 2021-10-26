@@ -4,6 +4,7 @@ import json
 import hashlib
 import uuid
 import datetime
+import subprocess
 import MOCPsettings
 
 from flask import (Flask, request, jsonify)
@@ -281,7 +282,7 @@ def schedule_jobs():
                                 schedule_date, 
                                 schedule_time from mocp_schedule_job
                     WHERE {}
-                    ORDER BY system, suite, job""".format(condition)
+                    ORDER BY schedule_date, schedule_time, system, suite, job""".format(condition)
                 try:
                     mycursor=cnx.cursor()
 
@@ -385,7 +386,75 @@ def schedule_job():
     reply=response_message(response, sys_message)        
 
     return jsonify(reply), response
+
+
+@app.route("/sysinfo", methods=['GET'])
+def get_sys_info():  
+    logger.info('Get System Information')
+    sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    if not authorised():
+        sys_message='Invalid token or token expired'
+        response = 403
+    else: 
+        mycursor=cnx.cursor()
+        sql = """SELECT * FROM `mocp_schedule` WHERE 1"""
+
+        try:
+            mycursor.execute(sql)
+            rec=mycursor.fetchone()
+
+        except mysql.connector.Error as err:
+            logger.error(sql)
+            logger.error(err)
+            response = 500
+        else:
+        
+            if mycursor.rowcount != 1:
+                schedule_date = 'unknown'
+            else:
+                schedule_date=str(rec[1])
+                processes=subprocess.run('ps -ef',capture_output=True,text=True,shell=True).stdout
+                if 'apache2' in processes :
+                    apache = 'Running'
+                else:
+                    apache = 'Not running'
+                   
+                if 'MOCP_schedular' in processes :
+                    schedular = 'Running'
+                else:
+                    schedular = 'Not running'
+
+                if 'MOCP_job_controller' in processes :
+                    job_controller = 'Running'
+                else:
+                    job_controller = 'Not running'              
+                if 'MOCP_job_runner' in processes :
+                    job_runner = 'Running'
+                else:
+                    job_runner = 'Not running'
+                return_payload = {'payload' : {
+                                  'schedule_date' : schedule_date,
+                                  'apache' : apache,
+                                  'schedular' : schedular,
+                                  'job_controller' : job_controller,
+                                  'job_runner' : job_runner
+                                }}
+                reply = {'http_reply' :{
+                            'http_code' : 200,
+                            'http_message' : 'Success',
+                            'system_message' : sys_message}}
+                logger.info(return_payload)
+                return jsonify(return_payload, reply), 200 
+    reply=response_message(response, sys_message)        
+    return jsonify(reply), response   
     
+
+        
     
 @app.route("/user", methods=['GET', 'PUT'])
 def login():
@@ -632,7 +701,6 @@ def authorised():
 #   header id changed from user_id to user as underscore caused header to be ignored by Apache wsgi
 #
     user=request.headers.get('user')
-    logger.info("test")
     in_token=request.headers.get('token')
     if not user or not in_token:
         logger.info("No user or token")

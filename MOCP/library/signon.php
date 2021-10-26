@@ -1,0 +1,80 @@
+<?php 
+session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
+<html>
+
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/templates/heading.inc.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/library/functions.inc.php';?>
+<?php // include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/library/init.inc.php'; ?>
+<div class="w3-sidebar w3-bar-block" style="width:25%">
+
+
+
+</div>
+
+
+<div style="margin-left:25%">
+<div class="w3-container w3-margin">
+<?php
+// define variables and set to empty values
+$unameErr = $passwordErr = "";
+$uname = $password = "";
+$errors = false;
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (empty($_POST["uname"])) {
+    $unameErr = "User name is required";
+	$errors = true;
+  } else {
+    $uname = ($_POST["uname"]);
+  }
+
+  if (empty($_POST["password"])) {
+    $passwordErr = "Password is required";
+	$errors = true;
+
+  } else {
+    $password = ($_POST["password"]);
+  }
+  if (! $errors ) {
+
+	  $payload = "{ \"user_id\" : \"{$uname }\", \"password\" : \"{$password}\"}";
+		
+
+	  $response = check_credentials($payload);
+	  $reply=json_decode($response,true);
+	  
+	  if ($reply[1]['http_reply']['http_code'] == 200) {
+			$_SESSION["user_id"] = $uname;
+			$_SESSION["token"] = $reply[0]['payload']['token'];
+			$_SESSION['schedule_date'] = get_schedule_date();
+		    header('Location: /MOCP/library/frontpage.php');
+			ob_flush();
+			exit;
+	  }
+	  $passwordErr = 'Sign on refused';
+	  $passwordErr = $_SESSION["token"];
+  }
+
+	
+}
+
+
+	
+?>
+<form  method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+  <label for="fname">User name:</label><br>
+  <input type="text" id="uname" name="uname" value="<?php echo $uname?>"><span class="error"> <?php echo $unameErr;?></span><br>
+  <label for="lname">Password:</label><br>
+  <input type="password" id="password" name="password" > <span class="error"> <?php echo $passwordErr;?></span><br><br>
+  <input class="w3-button w3-white w3-round-large w3-small" type="submit" value="Sign in">
+</form>
+
+</div>
+</div>
+</body>
+
+</html>
