@@ -41,42 +41,20 @@ error_reporting(E_ALL);
 <div>
 <?php //echo "Gabba Gabba hey " . $_SESSION["token"];?>
 </div>
-<div>
-  <table class="w3-table w3-striped w3-border" style="width:90%">
-    <tr>
-      <th>System</th>
-      <th>Suite</th>
-      <th>Job</th>
-	  <th>Status</th>
+<div id="tableholder"></div> 
+<script>
 
-    </tr>
-<?php
-	$payload = "{\"schedule_date\" : \"{$_SESSION['schedule_date']}\"}";
-	$reply=get_schedule_jobs($payload);
-	if (array_key_exists('system_message', $reply)) {
-		echo $reply['system_message'];
-	} else {
-		foreach ($reply as $job) {
+   $(document).ready(function(){
+    refreshTable();
+    });
 
-			echo "<tr>
-				   <td> {$job['system']} </td>
-				   <td> {$job['suite']} </td>
-				   <td> {$job['job']} </td>
-				   <td> {$job['status']} </td>
-				 </tr>";
-		};
-	};
+function refreshTable(){
+   setInterval(function(){  
+    $('#tableholder').load('get_schedule_data.php?v=1')
+   }, 1000);
+ }
 
-
-
-
-?>
-
-
-
-  </table>
-
-</div> 
+</script>
 </div>
 </body>
 

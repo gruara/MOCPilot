@@ -127,4 +127,35 @@ curl_close($curl);
 
 
 }
+function update_schedule_job_status ($payload) {
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'http://192.168.68.133:80/api/v1.0/MOCPilot/schedule_job',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'PUT',
+  CURLOPT_POSTFIELDS => $payload,
+  CURLOPT_HTTPHEADER => array(
+    'user: ' . $_SESSION['user_id'],
+	'token: ' . $_SESSION['token'],
+	'Content-Type: application/json'
+  ),
+));
+
+$response = curl_exec($curl);
+
+return $response;
+
+curl_close($curl);
+
+	
+	
+	
+}	
 ?>

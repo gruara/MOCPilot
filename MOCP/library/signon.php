@@ -46,8 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	  $response = check_credentials($payload);
 	  $reply=json_decode($response,true);
-	  
+
+ // TODO Standardise response handling from web services
+
 	  if ($reply[1]['http_reply']['http_code'] == 200) {
+
 			$_SESSION["user_id"] = $uname;
 			$_SESSION["token"] = $reply[0]['payload']['token'];
 			$_SESSION['schedule_date'] = get_schedule_date();
@@ -56,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			exit;
 	  }
 	  $passwordErr = 'Sign on refused';
-	  $passwordErr = $_SESSION["token"];
+
   }
 
 	

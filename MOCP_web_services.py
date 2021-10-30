@@ -43,13 +43,17 @@ def insert_jobs():
             insert=''
             comma=''
             for job in jobs:
-                insert="""{} {} (0, '{}' , '{}', {}, '{}', '{}', '{}', "{}" , '2000-01-01' )""".format(insert,
+                insert="""{} {} (0, '{}' , '{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', "{}" , '2000-01-01' )""".format(insert,
                                                                                                comma,
                                                                                                job['system'],
                                                                                                job['suite'],
                                                                                                job['job'],
                                                                                                job['description'],
-                                                                                               job['schedule_scheme'],
+                                                                                               job['run_on'],
+                                                                                               job['or_run_on'],
+                                                                                               job['or_run_on2'],
+                                                                                               job['but_not_on'],
+                                                                                               job['and_not_on'],
                                                                                                job['schedule_time'],
                                                                                                job['command_line'])
                 comma=','
@@ -59,7 +63,11 @@ def insert_jobs():
                                             `suite`,
                                             `job`,
                                             `description`,
-                                            `schedule_scheme`,
+                                            `run_on`,
+                                            `or_run_on`,
+                                            `or_run_on2`,
+                                            `but_not_on`,
+                                            `and_not_on`,
                                             `schedule_time`,
                                             `command_line`,
                                             `last_scheduled`) 
