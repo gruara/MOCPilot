@@ -19,24 +19,8 @@ error_reporting(E_ALL);
 
 <div style="margin-left:25%">
 <form <form class="w3-container">
+<div class="w3-container w3-center "> <h2><?php echo 'Job Monitor';?></h2> </div>
 
-<div class="w3-row-padding">
-  <div class="w3-third" style="width:10%">
-    <input class="w3-input w3-border" type="text" placeholder="System" >
-  </div>
-  <div class="w3-third" style="width:10%">
-    <input class="w3-input w3-border" type="text" placeholder="Suite" >
-  </div>
-  <div class="w3-third" style="width:10%">
-    <input class="w3-input w3-border" type="text" placeholder="Job" >
-  </div>
-  <div class="w3-third" style="width:15%">
-    <input class="w3-input w3-border" type="text" placeholder=<?php  echo $_SESSION['schedule_date'] ?>>
-  </div>
-  <div class="w3-third" style="width:10%">
-	<input class="w3-button w3-white w3-round-large w3-small" type="submit" value="Refresh">
-  </div>
-</div>
 </form>
 <div>
 <?php //echo "Gabba Gabba hey " . $_SESSION["token"];?>

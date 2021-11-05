@@ -21,6 +21,168 @@ app=Flask("MOCP_web_services")
 
 token=''
 
+@app.route("/file_dependency", methods=['GET'])
+def get_file_dependencies():
+    logger.info('Get File Dependencies')
+    sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    if not authorised():
+        sys_message='Invalid token or token expired'
+        response = 403
+    else:    
+        req_payload=request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            system= req_payload.get('system')
+            suite=req_payload.get('suite')
+            job=req_payload.get('job')
+           
+            
+
+            condition="id > 0"
+            if system:
+                condition="{} AND system = '{}'".format(condition, system)
+            if suite:
+                condition="{} AND suite = '{}'".format(condition, suite)
+            if job:
+                condition="{} AND job = {}".format(condition, job)
+            sql="""SELECT   system, 
+                            suite, 
+                            job,
+                            full_path,
+                            rule
+
+                FROM mocp_file_dependency
+                WHERE {}
+                ORDER BY system, suite, job""".format(condition)
+            try:
+                mycursor=cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message='No records with given criteria'
+                    response = 404       
+                else:
+
+                    recs=mycursor.fetchall()
+                    payload=[]
+                    for rec_system, rec_suite, rec_job, rec_full_path, rec_rule in recs:
+            
+                        job_dict={'system' : rec_system,
+                                  'suite' : rec_suite,
+                                  'job' : rec_job,
+                                  'full_path' : rec_full_path,
+                                  'rule' : rec_rule}
+                        
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200            
+                    reply = {'http_reply' :{
+                            'http_code' : 200,
+                            'http_message' : 'Success',
+                            'system_message' : sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    reply=response_message(response, sys_message)        
+    return jsonify(reply), response 
+
+@app.route("/job", methods=['GET'])
+def get_jobs():
+    logger.info('Get Jobs')
+    sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    if not authorised():
+        sys_message='Invalid token or token expired'
+        response = 403
+    else:    
+        req_payload=request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            system= req_payload.get('system')
+            suite=req_payload.get('suite')
+            job=req_payload.get('job')
+           
+            
+
+            condition="id > 0"
+            if system:
+                condition="{} AND system = '{}'".format(condition, system)
+            if suite:
+                condition="{} AND suite = '{}'".format(condition, suite)
+            if job:
+                condition="{} AND job = {}".format(condition, job)
+            sql="""SELECT   system, 
+                            suite, 
+                            job,
+                            description,
+                            run_on,
+                            or_run_on,
+                            or_run_on2,
+                            but_not_on,
+                            and_not_on,
+                            schedule_time,
+                            command_line,
+                            last_scheduled   
+                FROM mocp_job
+                WHERE {}
+                ORDER BY system, suite, job""".format(condition)
+            try:
+                mycursor=cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message='No records with given criteria'
+                    response = 404       
+                else:
+                    recs=mycursor.fetchall()
+                    payload=[]
+                    for rec_system, rec_suite, rec_job, rec_desc, rec_run_on, rec_or_run_on, rec_or_run_on2, rec_but_not_on, rec_and_not_on, rec_schedule_time,rec_command_line, rec_last_scheduled in recs:
+            
+                        job_dict={'system' : rec_system,
+                                  'suite' : rec_suite,
+                                  'job' : rec_job,
+                                  'description' : rec_desc,
+                                  'run_on' : rec_run_on,
+                                  'or_run_on' : rec_or_run_on,
+                                  'or_run_on2' : rec_or_run_on2,
+                                  'but_not_on' : rec_but_not_on,
+                                  'and_not_on' : rec_and_not_on,
+                                  'schedule_time' : str(rec_schedule_time),
+                                  'command_line' : rec_command_line,
+                                  'last_scheduled' : rec_last_scheduled.strftime("%Y-%m-%d")}
+                        
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200            
+                    reply = {'http_reply' :{
+                            'http_code' : 200,
+                            'http_message' : 'Success',
+                            'system_message' : sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    reply=response_message(response, sys_message)        
+    return jsonify(reply), response    
+
 
 #@app.route("/api/v1.0/MOCP/job", methods=['POST'])
 @app.route("/job", methods=['POST'])
@@ -91,6 +253,84 @@ def insert_jobs():
 
     return jsonify(reply), response
 
+
+@app.route("/job_dependency", methods=['GET'])
+def get_job_dependencies():
+    logger.info('Get Job Dependencies')
+    sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+
+    if not authorised():
+        sys_message='Invalid token or token expired'
+        response = 403
+    else:    
+        req_payload=request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            system= req_payload.get('system')
+            suite=req_payload.get('suite')
+            job=req_payload.get('job')
+           
+            
+
+            condition="id > 0"
+            if system:
+                condition="{} AND system = '{}'".format(condition, system)
+            if suite:
+                condition="{} AND suite = '{}'".format(condition, suite)
+            if job:
+                condition="{} AND job = {}".format(condition, job)
+            sql="""SELECT   system, 
+                            suite, 
+                            job,
+                            dep_system,
+                            dep_suite,
+                            dep_job,
+                            met_if_not_scheduled
+
+                FROM mocp_job_dependency
+                WHERE {}
+                ORDER BY system, suite, job""".format(condition)
+            try:
+                mycursor=cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message='No records with given criteria'
+                    response = 404       
+                else:
+                    recs=mycursor.fetchall()
+                    payload=[]
+                    for rec_system, rec_suite, rec_job, rec_dep_system, rec_dep_suite, rec_dep_job, rec_met_if_not_scheduled in recs:
+            
+                        job_dict={'system' : rec_system,
+                                  'suite' : rec_suite,
+                                  'job' : rec_job,
+                                  'dep_system' : rec_dep_system,
+                                  'dep_suite' : rec_dep_suite,
+                                  'dep_job' : rec_dep_job,
+                                  'met_if_not_scheduled' : rec_met_if_not_scheduled}
+                        
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200            
+                    reply = {'http_reply' :{
+                            'http_code' : 200,
+                            'http_message' : 'Success',
+                            'system_message' : sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    reply=response_message(response, sys_message)        
+    return jsonify(reply), response  
 
 @app.route("/job_dependency", methods=['POST'])
 def insert_jobdependency():

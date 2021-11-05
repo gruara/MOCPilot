@@ -16,6 +16,15 @@ h2 {
   margin:0;
 
 }
+h3 {
+  font-family:Calibri;	
+  text-align: center;
+  font-size: 18;
+  color:#8FAADC;
+  background-color:#f9f9f9;
+  margin:0;
+
+}
 p {
   font-family:Calibri;	
   text-align: left;
@@ -31,5 +40,11 @@ span {
   color:#483D8B;
   background-color:#f9f9f9;
   margin:0;
-  font-size:13
+  font-size:13;
 }		
+.mocpInput {
+  background-color:#f9f9f9;
+  margin:0;
+  font-size:14;
+  border-style:none;
+}

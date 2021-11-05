@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
   <?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/library/functions.inc.php';?>
 
-  <table class="w3-table w3-striped w3-border" style="width:90%">
+  <table class="w3-table w3-striped w3-border w3-small" style="width:70%">
     <tr>
       <th>System</th>
       <th>Suite</th>

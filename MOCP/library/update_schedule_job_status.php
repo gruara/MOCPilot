@@ -54,19 +54,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\",\"schedule_date\" : \"{$schedule_date}\",\"new_status\" : \"{$status}\"}";
         $response = update_schedule_job_status($payload);
 	    $reply=json_decode($response,true);
-	}
+	
  // TODO Standardise response handling from web services
 
- 	  if ($reply['http_reply']['http_code'] == 200) {
-		  $errormessage = "Status updated";
-	  } else {	
-		  $errormessage = 'Updated failed or status already set';
-	  } 
-
+		if ($reply['http_reply']['http_code'] == 200) {
+			$errormessage = "Status updated";
+		} else {	
+			$errormessage = 'Updated failed or status already set';
+		} 
+	}
 }
 ?>
+<div class="w3-container w3-center "> <h2><?php echo 'Update Scedule Job Status';?></h2> </div>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-  <table class="w3-table  w3-border w3-container w3-center w3-left-align" style="width:50%">
+  <table class="w3-table  w3-border w3-container w3-center w3-left-align w3-small" style="width:50%">
     <tr>    
 	</tr>
 	<tr>
@@ -82,8 +83,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		<td><input type="number" class="w3-input " maxlength="6" id="job" name="job" value="<?php echo $job?>"></td>
 	</tr>
 		<tr>
-		<td><label>Scedule Date</label></td>
-		<td><input type="text" class="w3-input " required-pattern="<?php echo $date_validate ?> maxlength="6" id="schedule_date" name="schedule_date" value="<?php echo $schedule_date?>"></td>
+		<td><label>Schedule Date</label></td>
+<!--		<td><input type="text" class="w3-input " pattern="<?php echo $date_validate ?>" title = 'Date in YYYY-MM-DD format' maxlength="6" id="schedule_date" name="schedule_date" value="<?php echo $schedule_date?>"></td>-->
+		<td><input type="text" class="w3-input " maxlength="6" id="schedule_date" name="schedule_date" value="<?php echo $schedule_date?>"></td>
+
 	</tr>
 	<tr>
 		<td><label>New Status</label></td>

@@ -20,7 +20,7 @@ error_reporting(E_ALL);
 <div style="margin-left:25%">
 
 <div>
-
+<div class="w3-container w3-center "> <h2><?php echo 'System Information';?></h2> </div>
 </div>
 <div>
   <table class="w3-table w3-striped w3-border" style="width:90%">
