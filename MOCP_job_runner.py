@@ -6,6 +6,7 @@ import threading
 import subprocess
 import mysql.connector
 import logging
+import sys
 from MOCUtils import get_schedule_date, date_properties, insert_log_entry
 
 from time import sleep
@@ -26,14 +27,15 @@ active_threads=[]
 
 
 def main():
-    initialise()
+    schedule_info()
     while True:
         process()
-        sleep(60)#
+        sleep(MOCPsettings.runner_sleep_time)
+        schedule_info()
 #        clean_threads()
     cnx.close()
     
-def initialise():
+def schedule_info():
     global schedule_date
     logger.info('Job Runner Starting')
     logger.info('Schedule date = {}'.format(schedule_date))
@@ -43,7 +45,7 @@ def initialise():
         sys.exit(1)
     
 def process():
-    global schedule_date, job_dets
+    global schedule_date, job_dets, active_threads
     
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -81,13 +83,13 @@ def process():
                         'job' : job_job,
                         'status' : job_status,
                         'schedule_date' : job_schedule_date}
-            if active_threads.count('')<4:
+            if len(active_threads) < 4 :
                 run_job(cnx)
     cnx.commit()
 
 
-def run_job(cnx):
-    global schedule_date, job_dets
+def run_job(cnx): 
+    global schedule_date, job_dets, active_threads
 
     logger.info('Running {}'.format(job_dets['job']))
     mycursor= cnx.cursor()

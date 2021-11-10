@@ -333,7 +333,7 @@ def get_job_dependencies():
     return jsonify(reply), response  
 
 @app.route("/job_dependency", methods=['POST'])
-def insert_jobdependency():
+def insert_job_dependency():
     logger.info('Insert Job Dependencies')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
@@ -360,7 +360,7 @@ def insert_jobdependency():
                                                                                                dependency['dep_system'],
                                                                                                dependency['dep_suite'],
                                                                                                dependency['dep_job'],
-                                                                                               dependency['dep_type'],
+                                                                                               '',
                                                                                                dependency['met_if_not_scheduled'])
                 comma=','
 

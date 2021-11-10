@@ -21,13 +21,13 @@ logger=logging.getLogger('MOCP Schedular')
 
 
 def main():
-    initialise()
+    schedule_info()
     while True:
         process()
     cnx.close()
     logger.info('Schedular Finishing')
     
-def initialise():
+def schedule_info():
     global schedule_date, properties
     schedule_date=get_schedule_date()
     if schedule_date == 'Not defined':
@@ -143,7 +143,8 @@ def process():
     cnx.commit()
 
     mycursor.close() 
-    sleep(60)
+    sleep(MOCPsettings.schedular_sleep_time)
+    schedule_info()
     
 if __name__ == "__main__":
     main()

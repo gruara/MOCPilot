@@ -3,6 +3,7 @@ import mysql.connector
 import datetime
 import os.path
 import logging
+import sys
 from time import sleep
 from MOCUtils import get_schedule_date, date_properties, insert_log_entry
 
@@ -17,12 +18,12 @@ logger=logging.getLogger('MOCP Job Controller')
 
 
 def main():
-    initialise()
+    schedule_info()
     while True:
         process()
     cnx.close()
     
-def initialise():
+def schedule_info():
     global schedule_date
 
     logger.info('Job Controller Starting')
@@ -89,7 +90,8 @@ def process():
                     ready_to_run(cnx)
     cnx.commit()              
 
-    sleep(60)
+    sleep(MOCPsettings.controller_sleep_time)
+    schedule_info()
 
 
 

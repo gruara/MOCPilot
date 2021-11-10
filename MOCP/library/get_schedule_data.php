@@ -23,7 +23,7 @@ error_reporting(E_ALL);
 	} else {
 		foreach ($reply as $job) {
 			if ($job['status'] == 'RS') {
-				$color = "style='color:green;font-weight:bold'"; }
+				$color = "style='color:orange;font-weight:bold'"; }
 			elseif ($job['status'] == 'RE') {
 				$color = "style='color:red;font-weight:bold'"; }
 			else {
