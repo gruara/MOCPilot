@@ -47,10 +47,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	$errormessage = "";
 	$payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\"}";
-//	echo $payload;
-	$reply = list_jobs($payload);
-//	var_dump( $reply);
-//    $reply=json_decode($response,true);
+	$response = run_web_service('job', $payload, 'GET');
+	$reply=json_decode($response,true);
 
 
 };
@@ -97,10 +95,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (($_SERVER["REQUEST_METHOD"] == "POST") ) {
 	
  // TODO Standardise response handling from web services
-		if (array_key_exists('system_message', $reply)) {
-			$reply['system_message'];
+ if ($reply[1]['http_reply']['http_code'] != 200) {
+			$reply[1]['system_message'];
 		} else {
-			foreach ($reply as $job) {
+			foreach ($reply[0] as $job) {
 
 
 				echo "<tr>
@@ -113,12 +111,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					 </tr>";
 				$payload = "{ \"system\" : \"{$job['system'] }\", \"suite\" : \"{$job['suite']}\",	\"job\" : \"{$job['job']}\"}";
 
-				$reply2 = list_job_dependencies($payload);
-				if (array_key_exists('system_message', $reply2)) {
-					$reply2['system_message'];
+				$response = run_web_service('job_dependency', $payload, 'GET');
+				$reply2=json_decode($response,true);
+				if ($reply[1]['http_reply']['http_code'] != 200) {
+					$reply2[1]['system_message'];
 				} else {
 //					$jobx = 'bbb';
-					foreach ($reply2 as $job2) {
+					foreach ($reply2[0] as $job2) {
 					$jobx=sprintf( "%s %s %s", $job2['dep_system'], $job2['dep_suite'], $job2['dep_job']);
 						echo "<tr><td></td><td></td><td></td><td></td>
 								<td> {$jobx}</td>
@@ -127,12 +126,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 							</tr>";
 					};
 				};
-				$reply2 = list_file_dependencies($payload);
-				if (array_key_exists('system_message', $reply2)) {
-					$reply2['system_message'];
+				$response = run_web_service('file_dependency', $payload, 'GET');
+				$reply2=json_decode($response,true);
+
+				if ($reply[1]['http_reply']['http_code'] != 200) {
+					$reply2[1]['system_message'];
 				} else {
 
-					foreach ($reply2 as $job2) {
+					foreach ($reply2[0] as $job2) {
 
 						echo "<tr><td></td><td></td><td></td><td></td><td></td><td></td>
 								<td> {$job2['full_path']}</td>

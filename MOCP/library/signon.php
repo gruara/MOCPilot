@@ -23,6 +23,8 @@ error_reporting(E_ALL);
 $unameErr = $passwordErr = "";
 $uname = $password = "";
 $errors = false;
+$_SESSION["user_id"] = '';
+$_SESSION["token"] = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (empty($_POST["uname"])) {
@@ -44,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	  $payload = "{ \"user_id\" : \"{$uname }\", \"password\" : \"{$password}\"}";
 		
 
-	  $response = check_credentials($payload);
+	  $response = run_web_service('user', $payload, 'GET');
 	  $reply=json_decode($response,true);
 
  // TODO Standardise response handling from web services
@@ -52,9 +54,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	  if ($reply[1]['http_reply']['http_code'] == 200) {
 
 			$_SESSION["user_id"] = $uname;
-			$_SESSION["token"] = $reply[0]['payload']['token'];
+			$_SESSION["token"] = $reply[0]['token'];
 			$_SESSION['schedule_date'] = get_schedule_date();
-		    header('Location: /MOCP/library/frontpage.php');
+		  header('Location: /MOCP/library/frontpage.php');
 			ob_flush();
 			exit;
 	  }

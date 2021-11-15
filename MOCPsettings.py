@@ -1,13 +1,39 @@
-DB_USER='awg'
-DB_PASSWORD='iolabr0n'
+import yaml
 
-system_user_id='system@MOCP.com'
-system_token='976f0c88-0aab-4dd5-a352-606b5d5b92b5'
+with open('/etc/MOC/config.yml', 'r') as f:
+    yaml_in=yaml.load(f, Loader=yaml.FullLoader)
 
+main_conf=yaml_in['Service']['config']
+env=yaml_in['Service']['environment']
 
-schedular_sleep_time=600
-controller_sleep_time=60
-runner_sleep_time=60
+with open(main_conf, 'r') as f:
+    yaml_in=yaml.load(f, Loader=yaml.FullLoader)
+
+config=yaml_in['Environments'][env]
+
+DB_USER=config['DB']['db user']
+DB_PASSWORD=config['DB']['db password']
+
+system_user_id=''
+system_token=''
+
+maximum_concurrency=config['Various']['maximum concurrency']
+
+schedular_sleep_time=config['Timers']['schedular sleep time']
+controller_sleep_time=config['Timers']['controller sleep time']
+runner_sleep_time=config['Timers']['runner sleep time']
 
 # life of token in minutes
-TOKEN_EXPIRY=1440
+TOKEN_EXPIRY=config['Timers']['token expiry']
+
+
+LOGGING_LEVEL=config['Logging']['level']
+LOGGING_FORMAT=config['Logging']['format']
+LOGGING_FILE_WEB_SERVICES=config['Logging']['web services filename']
+LOGGING_FILE_SCHEDULAR=config['Logging']['schedular log filename']
+LOGGING_FILE_COTROLLER=config['Logging']['controller log filename']
+LOGGING_FILE_RUNNER=config['Logging']['runner log filename']
+
+
+    
+

@@ -1,0 +1,50 @@
+---
+  Environments : 
+    Test:
+      DB: 
+        name: MOCPilot
+        db user : awg
+        db password : iolabr0n
+        host: localhost
+      Web_services:
+        name : MOCPilot
+        version : v1.0
+        common_url: http://192.168.68.133:80/api/
+      Timers:
+        schedular sleep time : 600 # seconds
+        controller sleep time : 60 # seconds
+        runner sleep time : 60 # seconds
+        token expiry : 1440 # minutes
+      Logging:
+        level : INFO
+        format : '%(asctime)s - %(name)s - %(threadName)s %(levelname)s: %(message)s'
+        web services filename : /home/pi/log/MOCP_Web_Services.log
+        schedular log filename : /home/pi/log/MOCP_Schedular.log
+        controller log filename : /home/pi/log/MOCP_Job_Controller.log
+        runner log filename : /home/pi/log/MOCP_Job_Runner.log
+      Various:
+        maximum concurrency : 6
+  Live:
+      DB: 
+        name: MOCPilot
+        db user : awg
+        db password : iolabr0n
+        host: localhost
+      Web_services:
+        name : MOCPilot
+        version : v1.0
+        common_url: http://192.168.68.133:80/api/
+      Timers:
+        schedular sleep time : 600 # seconds
+        controller sleep time : 60 # seconds
+        runner sleep time : 60 # seconds
+        token expiry : 1440 # minutes
+      Logging:
+        level : WARNING
+        format : '%(asctime)s - %(name)s - %(threadName)s %(levelname)s: %(message)s'
+        web services filename : /home/pi/log/MOCP_Web_Services.log
+        schedular log filename : /home/pi/log/MOCP_Schedular.log
+        controller log filename : /home/pi/log/MOCP_Job_Controller.log
+        runner log filename : /home/pi/log/MOCP_Job_Runner.log
+      Various:
+        maximum concurrency : 6

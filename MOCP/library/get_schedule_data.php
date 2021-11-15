@@ -9,19 +9,21 @@ error_reporting(E_ALL);
 
   <table class="w3-table w3-striped w3-border w3-small" style="width:70%">
     <tr>
+
       <th>System</th>
       <th>Suite</th>
       <th>Job</th>
 	  <th>Status</th>
+	  <th style="width:25%">Schedule<br>Time</th>	
 
     </tr>
 <?php
 	$payload = "{\"schedule_date\" : \"{$_SESSION['schedule_date']}\"}";
-	$reply=get_schedule_jobs($payload);
-	if (array_key_exists('system_message', $reply)) {
-		echo $reply['system_message'];
-	} else {
-		foreach ($reply as $job) {
+	$response=run_web_service('schedule_job', $payload, 'GET');
+	$reply=json_decode($response,true);
+
+	if ($reply[1]['http_reply']['http_code'] == 200) {
+		foreach ($reply[0] as $job) {
 			if ($job['status'] == 'RS') {
 				$color = "style='color:orange;font-weight:bold'"; }
 			elseif ($job['status'] == 'RE') {
@@ -29,16 +31,22 @@ error_reporting(E_ALL);
 			else {
 				$color = "style='color:black;font-weight:normal'";
 			};
-
-
 			echo "<tr {$color}'>
-				   <td> {$job['system']} </td>
-				   <td> {$job['suite']} </td>
-				   <td> {$job['job']} </td>
-				   <td> {$job['status']} </td>
-				 </tr>";
-		};
+						
+						<td> {$job['system']} </td>
+						<td> {$job['suite']} </td>
+						<td> {$job['job']} </td>
+						<td> {$job['status']} </td>
+						<td> {$job['schedule_time']} </td>
+					</tr>";
+					
+			};
+		
+	} else {
+		echo $reply['system_message'];
 	};
+
+	
 
 ?>
   </table>

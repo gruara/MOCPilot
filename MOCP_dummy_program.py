@@ -10,7 +10,7 @@ def main():
     sleep(run_time)
     
     result=random.randint(0,9)
-    print(result)
+
     if result > 8:
         exit(result)
     else:

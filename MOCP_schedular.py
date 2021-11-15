@@ -14,9 +14,9 @@ schedule_date=''
 
 
 
-logging.basicConfig(level=logging.DEBUG,
-                    filename='/home/pi/log/MOCP_Schedular.log',filemode='a',
-                    format='%(asctime)s - %(name)s -%(levelname)s: %(message)s')
+logging.basicConfig(level=MOCPsettings.LOGGING_LEVEL,
+                    filename=MOCPsettings.LOGGING_FILE_SCHEDULAR,filemode='a',
+                    format=MOCPsettings.LOGGING_FORMAT)
 logger=logging.getLogger('MOCP Schedular')
 
 

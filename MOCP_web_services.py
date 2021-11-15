@@ -7,15 +7,16 @@ import datetime
 import subprocess
 import MOCPsettings
 
+
 from flask import (Flask, request, jsonify)
 
 
 
-logging.basicConfig(level=logging.DEBUG,
-                    filename='/home/pi/log/MOCP_Web_Services.log',filemode='a',
-                    format='%(asctime)s - %(name)s - %(threadName)s %(levelname)s: %(message)s')
+logging.basicConfig(level=MOCPsettings.LOGGING_LEVEL,
+                    filename=MOCPsettings.LOGGING_FILE_WEB_SERVICES,filemode='a',
+                    format=MOCPsettings.LOGGING_FORMAT)
 logger=logging.getLogger('MOCP Web Services')
-logger.info('Web Services Starting')
+logger.debug('Web Services Starting')
 
 app=Flask("MOCP_web_services")
 
@@ -23,7 +24,7 @@ token=''
 
 @app.route("/file_dependency", methods=['GET'])
 def get_file_dependencies():
-    logger.info('Get File Dependencies')
+    logger.debug('Get File Dependencies')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -93,12 +94,13 @@ def get_file_dependencies():
                             'system_message' : sys_message}}
                     return jsonify(return_payload, reply), response
     cnx.commit()
+    return_payload={}
     reply=response_message(response, sys_message)        
-    return jsonify(reply), response 
+    return jsonify(return_payload, reply), response 
 
 @app.route("/job", methods=['GET'])
 def get_jobs():
-    logger.info('Get Jobs')
+    logger.debug('Get Jobs')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -157,7 +159,7 @@ def get_jobs():
                     recs=mycursor.fetchall()
                     payload=[]
                     for rec_system, rec_suite, rec_job, rec_desc, rec_run_on, rec_or_run_on, rec_or_run_on2, rec_but_not_on, rec_and_not_on, rec_schedule_time,rec_command_line, rec_last_scheduled in recs:
-            
+                        stime=rec_schedule_time
                         job_dict={'system' : rec_system,
                                   'suite' : rec_suite,
                                   'job' : rec_job,
@@ -167,7 +169,7 @@ def get_jobs():
                                   'or_run_on2' : rec_or_run_on2,
                                   'but_not_on' : rec_but_not_on,
                                   'and_not_on' : rec_and_not_on,
-                                  'schedule_time' : str(rec_schedule_time),
+                                  'schedule_time' : str(datetime.datetime.strptime(str(stime),"%H:%M:%S").time()),
                                   'command_line' : rec_command_line,
                                   'last_scheduled' : rec_last_scheduled.strftime("%Y-%m-%d")}
                         
@@ -180,14 +182,15 @@ def get_jobs():
                             'system_message' : sys_message}}
                     return jsonify(return_payload, reply), response
     cnx.commit()
+    return_payload={}
     reply=response_message(response, sys_message)        
-    return jsonify(reply), response    
+    return jsonify(return_payload, reply), response    
 
 
 #@app.route("/api/v1.0/MOCP/job", methods=['POST'])
 @app.route("/job", methods=['POST'])
 def insert_jobs():
-    logger.info('Insert Jobs')
+    logger.debug('Insert Jobs')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -249,14 +252,15 @@ def insert_jobs():
                 cnx.commit()
                 sys_message='Records inserted'
                 response = 200
+    return_payload={}
     reply=response_message(response, sys_message)        
 
-    return jsonify(reply), response
+    return jsonify(return_payload, reply), response
 
 
 @app.route("/job_dependency", methods=['GET'])
 def get_job_dependencies():
-    logger.info('Get Job Dependencies')
+    logger.debug('Get Job Dependencies')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -329,12 +333,13 @@ def get_job_dependencies():
                             'system_message' : sys_message}}
                     return jsonify(return_payload, reply), response
     cnx.commit()
+    return_payload={}
     reply=response_message(response, sys_message)        
-    return jsonify(reply), response  
+    return jsonify(return_payload, reply), response  
 
 @app.route("/job_dependency", methods=['POST'])
 def insert_job_dependency():
-    logger.info('Insert Job Dependencies')
+    logger.debug('Insert Job Dependencies')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -389,13 +394,14 @@ def insert_job_dependency():
                 cnx.commit()
                 sys_message='Records inserted'
                 response = 200
+    return_payload={}
     reply=response_message(response, sys_message)        
 
-    return jsonify(reply), response
+    return jsonify(return_payload, reply), response
 
 @app.route("/log", methods=['POST'])
 def insert_log(): 
-    logger.info('Insert log') 
+    logger.debug('Insert log') 
     sys_message='None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -443,15 +449,15 @@ def insert_log():
                 else:
                     sys_message='Unknown error'
                     response = 500
-        
+    return_payload={}    
     reply=response_message(response, sys_message)        
 
-    return jsonify(reply), response  
+    return jsonify(return_payload, reply), response  
     
     
 @app.route("/schedule_date", methods=['GET'])
 def get_schedule_date():
-    logger.info('Get Schedule date')
+    logger.debug('Get Schedule date')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -477,22 +483,23 @@ def get_schedule_date():
             sys_message='Unknown error'
             response = 404
     if response == 200:
-        return_payload = {'payload' : {
+        return_payload =  {
                         'schedule_date' : schedule_date
-                        }}
+                        }
         reply = {'http_reply' :{
                     'http_code' : 200,
                     'http_message' : 'Success',
                     'system_message' : sys_message}}
         return jsonify(return_payload, reply), 200 
     else:
-        reply=response_message(response, sys_message)        
-        return jsonify(reply), response
+        reply=response_message(response, sys_message) 
+        return_payload={}       
+        return jsonify(return_payload, reply), response
 
 
 @app.route("/schedule_job", methods=['GET'])
 def schedule_jobs():
-    logger.info('Get Schedule Jobs')
+    logger.debug('Get Schedule Jobs')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -547,13 +554,14 @@ def schedule_jobs():
                         recs=mycursor.fetchall()
                         payload=[]
                         for rec_system, rec_suite, rec_job, rec_status, rec_schedule_date, rec_schedule_time in recs:
-                            date=rec_schedule_date
+                            sdate=rec_schedule_date
+                            stime=rec_schedule_time
                             job_dict={'system' : rec_system,
                                       'suite' : rec_suite,
                                       'job' : rec_job,
                                       'status' : rec_status,
-                                      'schedule_date' : date.strftime("%Y-%m-%d"),
-                                      'schedule_time' : str(rec_schedule_time)}
+                                      'schedule_date' : sdate.strftime("%Y-%m-%d"),
+                                      'schedule_time' : str(datetime.datetime.strptime(str(stime),"%H:%M:%S").time())}
                             
                             payload.append(job_dict)
                         return_payload = payload
@@ -564,14 +572,16 @@ def schedule_jobs():
                                 'system_message' : sys_message}}
                         return jsonify(return_payload, reply), response
     cnx.commit()
-    reply=response_message(response, sys_message)        
-    return jsonify(reply), response    
+    return_payload={}
+    reply=response_message(response, sys_message) 
+    return jsonify(return_payload, reply), response       
+
 
 
 
 @app.route("/schedule_job", methods=['PUT'])
 def schedule_job():
-    logger.info('Update Schedule Job Status {}')
+    logger.debug('Update Schedule Job Status {}')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -631,14 +641,15 @@ def schedule_job():
                         sys_message='Status updated'
                         response = 200
     
-    reply=response_message(response, sys_message)        
+    reply=response_message(response, sys_message)    
+    return_payload={}    
 
-    return jsonify(reply), response
+    return jsonify(return_payload, reply), response
 
 
 @app.route("/sysinfo", methods=['GET'])
 def get_sys_info():  
-    logger.info('Get System Information')
+    logger.debug('Get System Information')
     sys_message= 'None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -666,7 +677,7 @@ def get_sys_info():
                 schedule_date = 'unknown'
             else:
                 schedule_date=str(rec[1])
-                processes=subprocess.run('ps -ef',capture_output=True,text=True,shell=True).stdout
+                processes=subprocess.run("ps -ef" ,capture_output=True,text=True,shell=True).stdout
                 if 'apache2' in processes :
                     apache = 'Running'
                 else:
@@ -685,20 +696,21 @@ def get_sys_info():
                     job_runner = 'Running'
                 else:
                     job_runner = 'Not running'
-                return_payload = {'payload' : {
+                return_payload = {
                                   'schedule_date' : schedule_date,
                                   'apache' : apache,
                                   'schedular' : schedular,
                                   'job_controller' : job_controller,
                                   'job_runner' : job_runner
-                                }}
+                                }
                 reply = {'http_reply' :{
                             'http_code' : 200,
                             'http_message' : 'Success',
                             'system_message' : sys_message}}
-                logger.info(return_payload)
+                logger.debug(return_payload)
                 return jsonify(return_payload, reply), 200 
-    reply=response_message(response, sys_message)        
+    return_payload={}
+    reply=response_message(return_payload, response, sys_message)        
     return jsonify(reply), response   
     
 
@@ -718,27 +730,27 @@ def login():
         new_password=payload.get('new_password')
         if request.method == 'GET' and user and password and not new_password:
         
-            logger.info('Log in request')
+            logger.debug('Log in request')
             response, sys_message=login_user(user, password)
         elif request.method == 'PUT' and user and password and new_password:
-            logger.info('Change password request')
+            logger.debug('Change password request')
             response, sys_message=change_password(user, password, new_password)
         else:
             response = 400
             
     if response == 200:
-        return_payload = {'payload' : {
+        return_payload =  {
                         'token' : token
-                        }}
+                        }
         reply = {'http_reply' :{
                     'http_code' : 200,
                     'http_message' : 'Success',
                     'system_message' : sys_message}}
-        return jsonify(return_payload, reply), response
     else:
+        return_payload={}
         reply=response_message(response, sys_message)        
 
-        return jsonify(reply), response
+    return jsonify(return_payload,reply), response
 
         
 def login_user(user, password):
@@ -847,7 +859,7 @@ def change_password(user, password, new_password):
     
 @app.route("/user", methods=['POST'])
 def new_user(): 
-    logger.info('Insert user') 
+    logger.debug('Insert user') 
     sys_message='None'
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -896,10 +908,10 @@ def new_user():
                     else:
                         sys_message='Unknown error'
                         response = 500
-        
+    return_payload={}    
     reply=response_message(response, sys_message)        
 
-    return jsonify(reply), response  
+    return jsonify(return_payload, reply), response  
 
 
 def response_message(response, sys_message='None'):
@@ -951,7 +963,7 @@ def authorised():
     user=request.headers.get('user')
     in_token=request.headers.get('token')
     if not user or not in_token:
-        logger.info("No user or token")
+        logger.debug("No user or token")
         return False
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
@@ -970,18 +982,18 @@ def authorised():
         return False
     rec=mycursor.fetchone()
     if mycursor.rowcount < 1:
-        logger.info("No user rec returned")
+        logger.debug("No user rec returned")
         return False
 
     rec_user, rec_token, rec_token_expiry=rec
 
     if in_token != rec_token:
-        logger.info("Token does not match")
+        logger.debug("Token does not match")
         return False
     
     
     if datetime.datetime.now() > rec_token_expiry:
-        logger.info("Token expired")
+        logger.debug("Token expired")
         return False
     
     return True

@@ -12,10 +12,11 @@ from MOCUtils import get_schedule_date, date_properties, insert_log_entry
 from time import sleep
 
 
-logging.basicConfig(level=logging.DEBUG,
-                    filename='/home/pi/log/MOCP_Job_Runner.log',filemode='a',
-                    format='%(asctime)s - %(name)s - %(threadName)s %(levelname)s: %(message)s')
+logging.basicConfig(level=MOCPsettings.LOGGING_LEVEL,
+                    filename=MOCPsettings.LOGGING_FILE_RUNNER,filemode='a',
+                    format=MOCPsettings.LOGGING_FORMAT)
 logger=logging.getLogger('MOCP Job Runner')
+
 
 
 
@@ -27,7 +28,11 @@ active_threads=[]
 
 
 def main():
+ 
     schedule_info()
+    logger.info('Job Runner Starting')
+    logger.info('Schedule date = {}'.format(schedule_date))
+ 
     while True:
         process()
         sleep(MOCPsettings.runner_sleep_time)
@@ -37,8 +42,6 @@ def main():
     
 def schedule_info():
     global schedule_date
-    logger.info('Job Runner Starting')
-    logger.info('Schedule date = {}'.format(schedule_date))
     schedule_date=get_schedule_date()
     if schedule_date == 'Not defined':
         print('Schedule date not defined')
@@ -83,7 +86,7 @@ def process():
                         'job' : job_job,
                         'status' : job_status,
                         'schedule_date' : job_schedule_date}
-            if len(active_threads) < 4 :
+            if len(active_threads) < MOCPsettings.maximum_concurrency :
                 run_job(cnx)
     cnx.commit()
 
@@ -91,7 +94,7 @@ def process():
 def run_job(cnx): 
     global schedule_date, job_dets, active_threads
 
-    logger.info('Running {}'.format(job_dets['job']))
+    logger.info('Running {} {} {}'.format(job_dets['system'], job_dets['suite'], job_dets['job']))
     mycursor= cnx.cursor()
 
     sql = """UPDATE mocp_schedule_job set status = 'RS' WHERE id = {}""".format(job_dets['id'])
@@ -117,31 +120,16 @@ def run_job(cnx):
         except mysql.connector.Error as err:
             logger.error(sql)
             logger.error(err)
-        else:   
-            if active_threads.count(1) == 0:
-                active_threads.append(1)
+        else:  
+            for thread in range(MOCPsettings.maximum_concurrency):
+                if active_threads.count(thread) == 0:
+                    active_threads.append(thread)
         #        print('Thread 1')
-                t1 = threading.Thread(target=thread_run_job, args=(job_dets['system'], job_dets['suite'], job_dets['job'],'1'))
-                t1.start()
-            elif active_threads.count(2) == 0:
-                active_threads.append(2)
-        #        print('Thread 2')
-                t2 = threading.Thread(target=thread_run_job, args=(job_dets['system'], job_dets['suite'], job_dets['job'],'2'))
-                t2.start()
-            elif active_threads.count(3) == 0:
-                active_threads.append(3)
-        #        print('Thread 3')
-                t3 = threading.Thread(target=thread_run_job, args=(job_dets['system'], job_dets['suite'], job_dets['job'],'3'))
-                t3.start()
-            elif active_threads.count(4) == 0:
-                active_threads.append(4)
-        #        print('Thread 4')
-                t4 = threading.Thread(target=thread_run_job, args=(job_dets['system'], job_dets['suite'], job_dets['job'],'4'))
-                t4.start()
-            else:
-                logger.warning('No empty thread')
+                    t1 = threading.Thread(target=thread_run_job, args=(job_dets['system'], job_dets['suite'], job_dets['job'],str(thread)))
+                    t1.start()
+                    break
 
-#    clean_threads()
+
     
     
 def thread_run_job(system, suite, job, thread):
@@ -150,7 +138,7 @@ def thread_run_job(system, suite, job, thread):
                                   host='localhost',
                                   database='MOCpilot')
                                   
-    logger.info('Job {} starting'.format(job))
+    logger.info('Job {} {} {} starting'.format(system, suite, job))
     mycursor=cnx.cursor()
     try:
         sql = """SELECT command_line
@@ -176,7 +164,7 @@ def thread_run_job(system, suite, job, thread):
         else:
             status='RE'
             action='failed'
-        logger.info('Job {} {} '.format(job, action))
+        logger.info('Job {} {} {} {} '.format(system, suite, job, action))
             
         sql = """UPDATE mocp_schedule_job set status = '{}'
                 WHERE system = '{}'

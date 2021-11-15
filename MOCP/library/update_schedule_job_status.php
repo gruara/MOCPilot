@@ -34,7 +34,7 @@ $errormessage='';
 $errors=false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if ((empty($_POST['sys'])) or 
+    if ((empty($_POST['sys'])) or 
 	  (empty($_POST['suite'])) or
 	  (empty($_POST['job'])) or
 	  (empty($_POST['schedule_date'])) or
@@ -52,12 +52,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (! $errors ) {
 		$errormessage = "Status updated";
         $payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\",\"schedule_date\" : \"{$schedule_date}\",\"new_status\" : \"{$status}\"}";
-        $response = update_schedule_job_status($payload);
+        $response = run_web_service('schedule_job', $payload, 'PUT');
 	    $reply=json_decode($response,true);
 	
- // TODO Standardise response handling from web services
-
-		if ($reply['http_reply']['http_code'] == 200) {
+ 
+		if ($reply[1]['http_reply']['http_code'] == 200) {
 			$errormessage = "Status updated";
 		} else {	
 			$errormessage = 'Updated failed or status already set';

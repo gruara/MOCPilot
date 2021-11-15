@@ -1,0 +1,25 @@
+MOC_Pilot:
+    All:
+        ☐ Timeout when session deleted
+        ✔ Make common config for python/php YAML @done (13/11/2021, 15:39:25)
+        ☐ Move DB connection to common module
+        ☐ Add System and Suite validation when adding job Dependency
+        ✔ Move logging configuration to yaml @done (15/11/2021, 18:54:10)
+    Job Monitor:
+        ✔ Add schedule time @done (13/11/2021, 21:33:07)
+        ☐ add job override
+        ☐ add job expediate
+        ☐ refresh schedule date
+    Insert Job Dependency:
+        ☐ Check both jobs exist
+    Job Runner:
+        ✔ Make sub processing more efficieny @done (13/11/2021, 19:20:40)
+    Update Schedule Job:
+        ☐ Change validation
+    Schedular:
+        ☐ Real time scheduling
+    System information:
+        ☐ Add yaml data
+
+
+

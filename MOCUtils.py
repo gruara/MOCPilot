@@ -98,9 +98,8 @@ def get_schedule_date():
     else:
         if r.status_code == 200:
             resp = r.json()
-            payload=resp[0]
-            body=payload['payload']
-            schedule_date = body['schedule_date']
+ 
+            schedule_date = resp[0]['schedule_date']
             return str(schedule_date)
         else:
             return 'Not defined'

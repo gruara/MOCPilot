@@ -111,12 +111,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					  \"dep_job\" : \"{$dep_job}\",
 					  \"met_if_not_scheduled\" : \"{$met_if_not_scheduled}\"
 					  }]";
-        $response = insert_job_dependency($payload);
+        $response = run_web_service('job_dependency',$payload, 'POST');
 	    $reply=json_decode($response,true);
 	
  // TODO Standardise response handling from web services
 
-		if ($reply['http_reply']['http_code'] == 200) {
+		if ($reply[1]['http_reply']['http_code'] == 200) {
 			$errormessage = "Job inserted";
 		} else {	
 			$errormessage = "Insert failed";

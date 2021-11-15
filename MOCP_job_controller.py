@@ -11,9 +11,9 @@ from MOCUtils import get_schedule_date, date_properties, insert_log_entry
 schedule_date=''
 job_dets={}
 
-logging.basicConfig(level=logging.DEBUG,
-                    filename='/home/pi/log/MOCP_Job_Controller.log',filemode='a',
-                    format='%(asctime)s - %(name)s -%(levelname)s: %(message)s')
+logging.basicConfig(level=MOCPsettings.LOGGING_LEVEL,
+                    filename=MOCPsettings.LOGGING_FILE_COTROLLER,filemode='a',
+                    format=MOCPsettings.LOGGING_FORMAT)
 logger=logging.getLogger('MOCP Job Controller')
 
 
@@ -99,7 +99,7 @@ def check_job_dependency(cnx):
     global schedule_date, job_dets
     mycursor= cnx.cursor()
     
-    logger.info('Checking dependencies for job - {}'.format(job_dets['job']))
+    logger.info('Checking dependencies for job - {} {} {}'.format(job_dets['system'], job_dets['suite'],job_dets['job']))
     try:
         sql = """SELECT  id,
                          system,
@@ -197,7 +197,7 @@ def check_file_dependency(cnx):
 
     mycursor= cnx.cursor()
     
-    logger.info('Checking file dependencies for job - {}'.format(job_dets['job']))
+    logger.info('Checking file dependencies for job - {} {} {}'.format(job_dets['system'], job_dets['suite'], job_dets['job']))
     try:
         sql = """SELECT  id,
                          system,

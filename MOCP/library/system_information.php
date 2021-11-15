@@ -29,15 +29,17 @@ error_reporting(E_ALL);
 
     </tr>
 <?php
-	$reply=get_system_info();
-	if (array_key_exists('system_message', $reply)) {
+	$payload='{}';
+	$response=run_web_service('sysinfo',$payload,'GET');
+	$reply=json_decode($response,true);
+	if ($reply[1]['http_reply']['http_code'] != 200) {
 		echo $reply['system_message'];
 	} else {
-		echo '<tr><td>Schedule Date</td><td>' . $reply['payload']['schedule_date'] . '</td></tr>';
-		echo '<tr><td>Apache Web Services</td><td>' . $reply['payload']['apache'] . '</td></tr>';
-		echo '<tr><td>Job Schedular</td><td>' . $reply['payload']['schedular'] . '</td></tr>';
-		echo '<tr><td>Job Controller</td><td>' . $reply['payload']['job_controller'] . '</td></tr>';
-		echo '<tr><td>Job Runner</td><td>' . $reply['payload']['job_runner'] . '</td></tr>';
+		echo '<tr><td>Schedule Date</td><td>' . $reply[0]['schedule_date'] . '</td></tr>';
+		echo '<tr><td>Apache Web Services</td><td>' . $reply[0]['apache'] . '</td></tr>';
+		echo '<tr><td>Job Schedular</td><td>' . $reply[0]['schedular'] . '</td></tr>';
+		echo '<tr><td>Job Controller</td><td>' . $reply[0]['job_controller'] . '</td></tr>';
+		echo '<tr><td>Job Runner</td><td>' . $reply[0]['job_runner'] . '</td></tr>';
 	};
 ?>
 
