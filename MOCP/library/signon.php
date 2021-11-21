@@ -17,7 +17,7 @@ error_reporting(E_ALL);
 
 
 <div style="margin-left:25%">
-<div class="w3-container w3-margin">
+<div class="w3-container w3-margin mocpDiv">
 <?php
 // define variables and set to empty values
 $unameErr = $passwordErr = "";
@@ -70,12 +70,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	
 ?>
+
 <form  method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
   <label for="fname">User name:</label><br>
-  <input type="text" id="uname" name="uname" value="<?php echo $uname?>"><span class="error"> <?php echo $unameErr;?></span><br>
+  <input type="text" id="uname" name="uname"  value="<?php echo $uname?>"><span class="error"> <?php echo $unameErr;?></span><br>
   <label for="lname">Password:</label><br>
   <input type="password" id="password" name="password" > <span class="error"> <?php echo $passwordErr;?></span><br><br>
-  <input class="w3-button w3-white w3-round-large w3-small" type="submit" value="Sign in">
+  <input class="w3-button w3-light-grey w3-round-large w3-medium" type="submit" value="Sign in">
 </form>
 
 </div>

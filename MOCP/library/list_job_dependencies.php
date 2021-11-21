@@ -26,20 +26,20 @@ $initial_load=true;
 
 <div style="margin-left:20%">
 <?php 
-	if ($system == 'ALL') {
-			$system = '';
-	}
-	if ($suite == 'ALL') {
-		$suite = '';
-	}
-	if ($job == 'ALL') {
-			$job = '';
-	}
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	if (empty($_POST['sys'])) {
+		$system = '';
+	} else {
+		$system = strtoupper(($_POST["sys"]));
+	};
   
-	$system = strtoupper(($_POST["sys"]));
-	$suite = strtoupper(($_POST["suite"]));
+	if (empty($_POST['suite'])) {
+		$suite = '';
+	} else {
+		$suite = strtoupper(($_POST["suite"]));
+	};
 	$job = strtoupper(($_POST["job"]));
 
   
@@ -56,19 +56,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <form <form class="w3-container" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 <div class="w3-container w3-center "> <h2><?php echo 'List Job Dependencies';?></h2> </div>
-<div class="w3-row-padding w3-border">
+<div class="w3-row-padding">
   <div class="w3-third" style="width:10%">
-    <input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="system" name="sys" value="<?php echo $system?>" placeholder="SYSTEM">
+  	<?php system_select(); ?>
   </div>
   <div class="w3-third" style="width:10%">
-	<input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="suite" name="suite" value="<?php echo $suite?>" placeholder="SUITE">
+ 	 <?php suite_select(); ?>
   </div>
   <div class="w3-third" style="width:10%">
 	<input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="job" name="job" value="<?php echo $job?>" placeholder="JOB" >
  </div>
 
   <div class="w3-third" style="width:10%">
-	<input class="w3-button w3-white w3-round-large w3-small" type="submit" value="List">
+	<input class="w3-button w3-light-grey w3-round-large w3-medium" type="submit" value="List">
   </div>
   <div class="w3-third" >
 	<?php echo $errormessage ?>

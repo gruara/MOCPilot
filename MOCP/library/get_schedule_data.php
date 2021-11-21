@@ -43,7 +43,7 @@ error_reporting(E_ALL);
 			};
 		
 	} else {
-		echo $reply['system_message'];
+		echo 'No Schedule Data Available';
 	};
 
 	

@@ -10,9 +10,6 @@ error_reporting(E_ALL);
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/library/functions.inc.php';?>
 
 
-
-
-
 <div class="w3-sidebar w3-bar-block mocpMenu" style="width:20%">
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/library/left_menu.inc.php' ?>
 </div>
@@ -39,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	  (empty($_POST['job'])) or
 	  (empty($_POST['schedule_date'])) or
 	  (empty($_POST['status']))) {
+		// echo ($_POST['sys']). ($_POST['suite']). ($_POST['job']). ($_POST['schedule_date']). ($_POST['status']);
 		$errormessage="All fields must be supplied!";
 		$errors = true;
 	} else {
@@ -70,12 +68,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <tr>    
 	</tr>
 	<tr>
-		<td><label>System</label></td>
-		<td><input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="system" name="sys" value="<?php echo $system?>"></td>
+		<td ><label for "system"> Select System</label></td>
+		<td class="mocpSelect"><?php system_select(); ?></td>
 	</tr>	
 	<tr>
 		<td><label>Suite</label></td>
-		<td><input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10" id="suite" name="suite" value="<?php echo $suite?>"></td>
+		<td><?php suite_select(); ?></td>
 	</tr>
 	<tr>
 		<td><label>Job</label></td>
@@ -89,11 +87,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	</tr>
 	<tr>
 		<td><label>New Status</label></td>
-		<td><input type="text"class="w3-input " style="text-transform:uppercase" maxlength="2" id="status" name="status" value="<?php echo $status?>"></td>
+		<td><?php status_select(); ?></td>
 	</tr>
 	<tr><td  colspan="2" style="color:red;font-weight:bold"> <?php echo $errormessage?></td></tr>
   </table>
-    <br><input class="w3-button w3-white w3-round-large w3-medium" type="submit" value="Submit">
+    <br><input class="w3-button w3-light-grey w3-round-large w3-medium" type="submit" value="Submit">
 </form>
 </div> 
 </div>

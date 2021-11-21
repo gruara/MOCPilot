@@ -131,12 +131,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	</tr>
 	<tr>
 		<td><label>System</label></td>
-		<td><input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="system" name="sys" value="<?php echo $system?>"></td>
+		<td><?php system_select(); ?></td>
 		<td><span class="error"> <?php echo $error1;?></span></td>
 	</tr>	
 	<tr>
 		<td><label>Suite</label></td>
-		<td><input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10" id="suite" name="suite" value="<?php echo $suite?>"></td>
+		<td><?php suite_select(); ?></td>
 		<td><span class="error"> <?php echo $error2;?></span></td>
 	</tr>
 	<tr>
@@ -146,12 +146,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	</tr>
 	<tr>
 		<td><label>Dependent System</label></td>
-		<td><input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="dep_system" name="dep_sys" value="<?php echo $dep_system?>"></td>
+		<td><?php dep_system_select(); ?></td>
 		<td><span class="error"> <?php echo $error4;?></span></td>
 	</tr>	
 	<tr>
 		<td><label>Dependent Suite</label></td>
-		<td><input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10" id="dep_suite" name="dep_suite" value="<?php echo $dep_suite?>"></td>
+		<td><?php dep_suite_select(); ?></td>
 		<td><span class="error"> <?php echo $error5;?></span></td>
 	</tr>
 	<tr>
@@ -166,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	<tr><td  colspan="2" style="color:red;font-weight:bold"> <?php echo $errormessage?></td></tr>
   </table>
-    <br><input class="w3-button w3-white w3-round-large w3-medium" type="submit" value="Submit">
+    <br><input class="w3-button w3-light-grey w3-round-large w3-medium" type="submit" value="Submit">
 </form>
 </div> 
 </div>

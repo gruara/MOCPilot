@@ -1,8 +1,16 @@
-#import MOCUtils
+import MOCUtils
 import mysql.connector
 import subprocess
-from MOCUtils import get_schedule_date, date_properties, insert_log_entry
+import logging
+import MOCPsettings
 
+from MOCUtils import get_schedule_date, date_properties, insert_log_entry
+from flask import (Flask, request, jsonify)
+logging.basicConfig(level=MOCPsettings.LOGGING_LEVEL,
+                    filename=MOCPsettings.LOGGING_FILE_WEB_SERVICES,filemode='a',
+                    format=MOCPsettings.LOGGING_FORMAT)
+logger=logging.getLogger('MOCP Web Services')
+logger.debug('Web Services Starting')
 
 cnx = mysql.connector.connect(user='awg',
                               password='iolabr0n',
@@ -14,7 +22,7 @@ def main():
     properties=date_properties( schedule_date)
     print(properties)
 
-
+    get_sys_info()
 
 
 #    sub_process()
@@ -41,7 +49,19 @@ def sub_process():
     result=subprocess.run("python '/home/pi/Documents/Scripts/MOCP_dummy_program.py'",shell=True)
     print(result.returncode)
 
-    
+def get_sys_info():  
+    logger.debug('Get System Information')
+    sys_message= 'None'
+ 
+
+ 
+    processes=subprocess.run("ps -ef | grep 'python'" ,capture_output=True,text=True,shell=True).stdout
+
+    print(processes)
+  
+   
+
+
     
 if __name__ == "__main__":
     main()

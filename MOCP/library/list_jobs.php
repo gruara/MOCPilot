@@ -16,36 +16,29 @@ $initial_load=true;
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/templates/heading.inc.php' ?>
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/library/functions.inc.php';?>
 
-
-
-
-
 <div class="w3-sidebar w3-bar-block mocpMenu" style="width:20%">
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/library/left_menu.inc.php' ?>
 </div>
 
 <div style="margin-left:20%">
 <?php 
-	if ($system == 'ALL') {
-			$system = '';
-	}
-	if ($suite == 'ALL') {
-		$suite = '';
-	}
-	if ($job == 'ALL') {
-			$job = '';
-	}
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	if (empty($_POST['sys'])) {
+		$system = '';
+	} else {
+		$system = strtoupper(($_POST["sys"]));
+	};
   
-	$system = strtoupper(($_POST["sys"]));
-	$suite = strtoupper(($_POST["suite"]));
+	if (empty($_POST['suite'])) {
+		$suite = '';
+	} else {
+		$suite = strtoupper(($_POST["suite"]));
+	};
 	$job = strtoupper(($_POST["job"]));
 
-  
-
-
-	$errormessage = "";
+ 	$errormessage = "";
 	$payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\"}";
 	$response = run_web_service('job', $payload, 'GET');
 	$reply=json_decode($response,true);
@@ -55,19 +48,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <form <form class="w3-container" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 <div class="w3-container w3-center "> <h2><?php echo 'List Jobs';?></h2> </div>
-<div class="w3-row-padding w3-border">
-  <div class="w3-third" style="width:10%">
-    <input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="system" name="sys" value="<?php echo $system?>" placeholder="SYSTEM">
+<div class="w3-row-padding">
+  <div class="w3-third" style="width:10%" >
+  <?php system_select(); ?>
   </div>
   <div class="w3-third" style="width:10%">
-	<input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="suite" name="suite" value="<?php echo $suite?>" placeholder="SUITE">
+  <?php suite_select(); ?>
   </div>
   <div class="w3-third" style="width:10%">
 	<input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="job" name="job" value="<?php echo $job?>" placeholder="JOB" >
  </div>
 
-  <div class="w3-third" style="width:10%">
-	<input class="w3-button w3-white w3-round-large w3-small" type="submit" value="List">
+  <div class="w3-third" style="width:10%" >
+	<input class="w3-button w3-light-grey w3-round-large w3-medium"  type="submit" value="List">
   </div>
   <div class="w3-third" >
 	<?php echo $errormessage ?>
@@ -77,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div>
 
 </div>
-<div class="w3-responsive">
+<div class="w3-responsive" >
   <table class="w3-table w3-striped w3-small" style="width:100%">
     <tr>
       <th>System</th>
@@ -103,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			foreach ($reply[0] as $job) {
 
 
-				echo "<tr>
+				echo "<tr margin='none'>
 					   <td> {$job['system']} </td>
 					   <td> {$job['suite']} </td>
 					   <td> {$job['job']} </td>

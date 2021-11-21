@@ -3,6 +3,9 @@ session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+$system=htmlspecialchars($_GET["system"]);
+$suite=htmlspecialchars($_GET["suite"]);
+$job=htmlspecialchars($_GET["job"]);
 ?>
 <html>
 
@@ -24,17 +27,20 @@ error_reporting(E_ALL);
 </div>
 <div>
 <?php 
-$system='';
-$suite='';
-$job='';
-$description='';
-$run_on='';
-$or_run_on='';
-$or_run_on2='';
-$but_not_on='';
-$and_not_on='';
-$schedule_time='';
-$command_line='';
+
+$payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\"}";
+$response = run_web_service('job', $payload, 'GET');
+$reply=json_decode($response,true);
+$response=$reply[0][0];
+$description=$response['description'];
+$run_on=$response['run_on'];
+$or_run_on=$response['or_run_on'];
+$or_run_on2=$response['or_run_on2'];
+$but_not_on=$response['but_not_on'];
+$and_not_on=$response['and_not_on'];
+$schedule_time=$response['schedule_time'];
+$command_line=$response['command_line'];
+$last_scheduled=$response['last_scheduled'];
 $error1='';
 $error2='';
 $error3='';
@@ -46,35 +52,13 @@ $error8='';
 $error9='';
 $error10='';
 $error11='';
+$error12='';
 
 $errormessage='';
 $errors=false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (empty($_POST['sys'])) {
-
-		$error1="Field must be supplied!";
-		$errors = true;
-	} else {
-		$system = strtoupper(($_POST["sys"]));
-
-    } 
-    if (empty($_POST['suite'])) {
-
-		$error2="Field must be supplied!";
-		$errors = true;
-	} else {
-		$suite = strtoupper(($_POST["suite"]));
-
-    }
-    if (empty($_POST['job'])) {
-
-		$error3="Field must be supplied!";
-		$errors = true;
-	} else {
-		$job = strtoupper(($_POST["job"]));
-
-    }	
+ 
     if (empty($_POST['description'])) {
 
 		$error4="Field must be supplied!";
@@ -107,9 +91,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$command_line = ($_POST["command_line"]);
 
     }
+	if (empty($_POST['last_scheduled'])) {
+
+		$error12="Field must be supplied!";
+		$errors = true;
+	} else {
+		$last_scheduled = ($_POST["last_scheduled"]);
+
+    }
     if (! $errors ) {
 		$errormessage = "Status updated";
-        $payload = "[{ \"system\" : \"{$system }\",
+        $payload = "{ \"system\" : \"{$system }\",
 					  \"suite\" : \"{$suite}\",
 					  \"job\" : \"{$job}\",
 					  \"description\" : \"{$description}\",
@@ -119,40 +111,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					  \"but_not_on\" : \"{$but_not_on}\",
 					  \"and_not_on\" : \"{$and_not_on}\",
 					  \"schedule_time\" : \"{$schedule_time}\",
-					  \"command_line\" : \"{$command_line}\"
-					  }]";
-        $response = run_web_service('job', $payload, 'POST');
+					  \"command_line\" : \"{$command_line}\",
+					  \"last_scheduled\" : \"{$last_scheduled}\"
+					  }";
+        $response = run_web_service('job', $payload, 'PUT');
 	    $reply=json_decode($response,true);
 	
  // TODO Standardise response handling from web services
 
 		if ($reply[1]['http_reply']['http_code'] == 200) {
-			$errormessage = "Job inserted";
+			$errormessage = "Job updated";
 		} else {	
-			$errormessage = "Insert failed";
+			$errormessage = "Update failed";
 		} 
 	}
 }
+$repost=htmlspecialchars($_SERVER["PHP_SELF"]).sprintf('?system=%s&suite=%s&job=%d',$system,$suite,$job);
 ?>
-<div class="w3-container w3-center "> <h2><?php echo 'Insert Job';?></h2> </div>
-<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+<div class="w3-container w3-center "> <h2><?php echo 'Update Job';?></h2> </div>
+<form method="post" action="<?php echo $repost;?>">
   <table class="w3-table  w3-border w3-container w3-center w3-left-align w3-small" style="width:50%">
     <tr>    
 	</tr>
 	<tr>
 		<td><label>System</label></td>
-		<td><?php system_select(); ?></td>
+		<td><label><?php echo $system; ?></label></td>
 		<td><span class="error"> <?php echo $error1;?></span></td>
 	</tr>	
 	<tr>
 		<td><label>Suite</label></td>
-		<td><?php suite_select(); ?></td>
+        <td><label><?php echo $suite; ?></label></td>
 		<td><span class="error"> <?php echo $error2;?></span></td>
 	</tr>
 	<tr>
 		<td><label>Job</label></td>
-		<td><input type="number" class="w3-input " maxlength="6" id="job" name="job" value="<?php echo $job?>"></td>
-		<td><span class="error"> <?php echo $error3;?></span></td>
+        <td><label><?php echo $job; ?></label></td>
+    	<td><span class="error"> <?php echo $error3;?></span></td>
 	</tr>
 
 	<tr>
@@ -183,10 +177,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		<td><label>Schedule Time</label></td>
 		<td><input type="text"  class="w3-input " maxlength="10" id="schedule_time" name="schedule_time" value="<?php echo $schedule_time?>"></td>
 		<td><span class="error"> <?php echo $error10;?></span></td>
-	</tr>		<tr>
+	</tr>		
+	<tr>
 		<td><label>Command Line</label></td>
 		<td><input type="text"  class="w3-input " maxlength="500"id="command_line" name="command_line" value="<?php echo $command_line?>"></td>
 		<td><span class="error"> <?php echo $error11;?></span></td>
+	</tr>
+	<tr>
+		<td><label>Last Scheduled</label></td>
+		<td><input type="text"  class="w3-input " maxlength="500"id="last_scheduled" name="last_scheduled" value="<?php echo $last_scheduled?>"></td>
+		<td><span class="error"> <?php echo $error12;?></span></td>
 	</tr>	
 	<tr><td  colspan="2" style="color:red;font-weight:bold"> <?php echo $errormessage?></td></tr>
   </table>

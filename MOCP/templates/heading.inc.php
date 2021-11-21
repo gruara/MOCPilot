@@ -2,7 +2,7 @@
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="/MOCP/themes/styles.css">
+<link rel="stylesheet" type="text/css" href="/MOCP/themes/styles.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
 <style>

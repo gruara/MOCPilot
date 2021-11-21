@@ -14,7 +14,7 @@ from flask import (Flask, request, jsonify)
 
 logging.basicConfig(level=MOCPsettings.LOGGING_LEVEL,
                     filename=MOCPsettings.LOGGING_FILE_WEB_SERVICES,filemode='a',
-                    format=MOCPsettings.LOGGING_FORMAT)
+                    format='%(asctime)s - %(name)s - %(threadName)s %(levelname)s: %(message)s')                           #MOCPsettings.LOGGING_FORMAT)
 logger=logging.getLogger('MOCP Web Services')
 logger.debug('Web Services Starting')
 
@@ -152,11 +152,12 @@ def get_jobs():
                 logger.error(err)
                 response = 500
             else:
+                recs=mycursor.fetchall()
                 if mycursor.rowcount == 0:
                     sys_message='No records with given criteria'
                     response = 404       
                 else:
-                    recs=mycursor.fetchall()
+                   
                     payload=[]
                     for rec_system, rec_suite, rec_job, rec_desc, rec_run_on, rec_or_run_on, rec_or_run_on2, rec_but_not_on, rec_and_not_on, rec_schedule_time,rec_command_line, rec_last_scheduled in recs:
                         stime=rec_schedule_time
@@ -256,6 +257,80 @@ def insert_jobs():
     reply=response_message(response, sys_message)        
 
     return jsonify(return_payload, reply), response
+
+@app.route("/job", methods=['PUT'])
+def update_job():
+    logger.debug('Update Job')
+    sys_message= 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCpilot')
+    if not authorised():
+        sys_message='Invalid token or token expired'
+        response = 403
+    else:    
+        req_payload=request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            system= req_payload.get('system')
+            suite=req_payload.get('suite')
+            job=req_payload.get('job')
+            description=req_payload.get('description')
+            run_on=req_payload.get('run_on')
+            or_run_on=req_payload.get('or_run_on')
+            or_run_on2=req_payload.get('or_run_on2')
+            but_not_on=req_payload.get('but_not_on')
+            and_not_on=req_payload.get('and_not_on')
+            schedule_time=req_payload.get('schedule_time')
+            command_line=req_payload.get('command_line')
+            last_scheduled=req_payload.get('last_scheduled')
+           
+            sql = """UPDATE `mocp_job` SET  `description` = "{}",
+                                            `run_on` = '{}',
+                                            `or_run_on` = '{}',
+                                            `or_run_on2` = '{}',
+                                            `but_not_on` = '{}',
+                                            `and_not_on` = '{}',
+                                            `schedule_time` = '{}',
+                                            `command_line` = "{}",
+                                            `last_scheduled` = '{}'
+                     WHERE  `system` = '{}' AND
+                            `suite` = '{}' AND
+                            `job` = {}""".format(description,
+                                                 run_on,
+                                                 or_run_on,
+                                                 or_run_on2,
+                                                 but_not_on,
+                                                 and_not_on,
+                                                 schedule_time,
+                                                 command_line,
+                                                 last_scheduled,
+                                                 system,
+                                                 suite,
+                                                 job)
+            logger.debug(sql)        
+            try:
+                mycursor=cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.IntegrityError as err:
+                sys_message='Request contains duplicates - no records inserted'
+                response = 409
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                cnx.commit()
+                sys_message='Record updated'
+                response = 200
+    return_payload={}
+    reply=response_message(response, sys_message)        
+
+    return jsonify(return_payload, reply), response
+
 
 
 @app.route("/job_dependency", methods=['GET'])
@@ -547,11 +622,12 @@ def schedule_jobs():
                     logger.error(err)
                     response = 500
                 else:
+                    recs=mycursor.fetchall()
                     if mycursor.rowcount == 0:
                         sys_message='No records with given criteria'
                         response = 404       
                     else:
-                        recs=mycursor.fetchall()
+                       
                         payload=[]
                         for rec_system, rec_suite, rec_job, rec_status, rec_schedule_date, rec_schedule_time in recs:
                             sdate=rec_schedule_date
@@ -677,7 +753,7 @@ def get_sys_info():
                 schedule_date = 'unknown'
             else:
                 schedule_date=str(rec[1])
-                processes=subprocess.run("ps -ef" ,capture_output=True,text=True,shell=True).stdout
+                processes=subprocess.run("ps -ef " ,capture_output=True,text=True,shell=True).stdout
                 if 'apache2' in processes :
                     apache = 'Running'
                 else:

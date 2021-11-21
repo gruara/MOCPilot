@@ -42,5 +42,56 @@ function get_schedule_date() {
   };
 }
 
+function system_select() {
+  echo '<select class="w3-select"  name="sys",id="system">
+          <option value="" disabled selected>System</option>
+          <option value="CRED"> CRED </option>
+          <option value="PI"> PI </option>
+          <option value="SYSTEM"> SYSTEM </option>
+        </select>';
+
+}
+
+function suite_select() {
+  echo '<select class="w3-select"  name="suite",id="suite">
+          <option value="" disabled selected>Suite</option>
+          <option value="ADHOC"> ADHOC </option>
+          <option value="DAY"> DAY </option>
+          <option value="TP"> TP </option>
+          <option value="WEEK"> WEEK </option>
+        </select>';
+
+}
+
+function status_select() {
+  echo '<select class="w3-select"  name="status",id="status">
+          <option value="" disabled selected>Status</option>
+          <option value="RF"> RF </option>
+          <option value="RQ"> RQ </option>
+          <option value="SQ"> SQ </option>
+       </select>';
+
+}
+
+function dep_system_select() {
+  echo '<select class="w3-select"  name="dep_sys",id="dep_system">
+          <option value="" disabled selected>System</option>
+          <option value="CRED"> CRED </option>
+          <option value="PI"> PI </option>
+          <option value="SYSTEM"> SYSTEM </option>
+        </select>';
+
+}
+
+function dep_suite_select() {
+  echo '<select class="w3-select"  name="dep_suite",id="dep_suite">
+        <option value="" disabled selected>Suite</option>
+          <option value="ADHOC"> ADHOC </option>
+          <option value="DAY"> DAY </option>
+          <option value="TP"> TP </option>
+          <option value="WEEK"> WEEK </option>
+      </select>';
+
+}
 
 ?>
