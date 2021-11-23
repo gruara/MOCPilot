@@ -34,6 +34,6 @@ LOGGING_FILE_SCHEDULAR=config['Logging']['schedular log filename']
 LOGGING_FILE_COTROLLER=config['Logging']['controller log filename']
 LOGGING_FILE_RUNNER=config['Logging']['runner log filename']
 
-
+WEB_SERVICE_URL='{}/{}/{}/'.format(config['Web Services']['common url'],config['Web Services']['verion'],config['Web Services']['name'])
     
 

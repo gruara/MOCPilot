@@ -1,10 +1,10 @@
 MOC_Pilot:
     All:
-        ☐ Timeout when session deleted
+        ✔ Timeout when session deleted @done (22/11/2021, 20:18:18)
         ✔ Make common config for python/php YAML @done (13/11/2021, 15:39:25)
         ☐ Move DB connection to common module
-        ☐ Tighten System, Suite and Job validation when adding job Dependency
-        ☐ Display selected field on repost
+        ✔ Tighten System, Suite and Job validation when adding job Dependency @done (23/11/2021, 22:32:35)
+        ✔ Display selected field on repost @done (23/11/2021, 22:32:52)
         ✔ Move logging configuration to yaml @done (15/11/2021, 18:54:10)
     Job Monitor:
         ✔ Add schedule time @done (13/11/2021, 21:33:07)

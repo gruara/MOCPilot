@@ -1,5 +1,6 @@
 <?php
 
+
 function run_web_service($service, $payload, $method) {
   $curl = curl_init();
   $url = 'http://192.168.68.133:80/api/v1.0/MOCPilot/' . $service;
@@ -42,24 +43,45 @@ function get_schedule_date() {
   };
 }
 
-function system_select() {
-  echo '<select class="w3-select"  name="sys",id="system">
-          <option value="" disabled selected>System</option>
-          <option value="CRED"> CRED </option>
-          <option value="PI"> PI </option>
-          <option value="SYSTEM"> SYSTEM </option>
-        </select>';
+function system_select($all=false) {
+  
+  $systems=array("CRED","PI","SYSTEM");
+  
+  echo '<select class="w3-select"  name="sys",id="system">';
+  echo '<option value="" disabled>System</option>';
+  if ($all) {
+    echo "<option value=''> All </option>";
+
+  }
+  foreach ($systems as $sysname) {
+          if ($sysname == $_SESSION["last_system"]) {
+            $selected='selected';
+          } else {
+            $selected='';
+          }
+          echo "<option value=$sysname $selected> $sysname </option>";
+  };
+  echo "</select>";
 
 }
 
-function suite_select() {
-  echo '<select class="w3-select"  name="suite",id="suite">
-          <option value="" disabled selected>Suite</option>
-          <option value="ADHOC"> ADHOC </option>
-          <option value="DAY"> DAY </option>
-          <option value="TP"> TP </option>
-          <option value="WEEK"> WEEK </option>
-        </select>';
+function suite_select($all=false) {
+  $suites=array("ADHOC", "DAY", "TP", "WEEK");
+  echo '<select class="w3-select"  name="suite",id="suite">';
+  echo  '<option value="" disabled>Suite</option>';
+  if ($all) {
+    echo "<option value=''> All </option>";
+
+  }
+  foreach ($suites as $suitename) {
+    if ($suitename == $_SESSION["last_suite"]) {
+      $selected='selected';
+    } else {
+      $selected='';
+    }
+    echo "<option value=$suitename $selected> $suitename </option>";
+};
+    echo "</select>";
 
 }
 
@@ -93,5 +115,3 @@ function dep_suite_select() {
       </select>';
 
 }
-
-?>

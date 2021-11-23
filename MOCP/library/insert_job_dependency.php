@@ -1,9 +1,4 @@
-<?php 
-session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-?>
+
 <html>
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/templates/heading.inc.php' ?>
@@ -24,8 +19,8 @@ error_reporting(E_ALL);
 </div>
 <div>
 <?php 
-$system='';
-$suite='';
+$system=$_SESSION['last_system'];
+$suite=$_SESSION['last_suite'];
 $job='';
 $dep_system='';
 $dep_suite='';
@@ -50,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$errors = true;
 	} else {
 		$system = strtoupper(($_POST["sys"]));
+		$_SESSION['last_system'] = $_POST['sys'];
 
     } 
     if (empty($_POST['suite'])) {
@@ -58,6 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$errors = true;
 	} else {
 		$suite = strtoupper(($_POST["suite"]));
+		$_SESSION['last_suite'] = $_POST['suite'];
 
     }
     if (empty($_POST['job'])) {

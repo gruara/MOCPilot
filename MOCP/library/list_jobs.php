@@ -1,8 +1,5 @@
 <?php 
-session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+
 $system='';
 $suite='';
 $job='';
@@ -26,37 +23,43 @@ $initial_load=true;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if (empty($_POST['sys'])) {
-		$system = '';
+		$_SESSION['last_system']='';
 	} else {
-		$system = strtoupper(($_POST["sys"]));
-	};
-  
+		$system=$_POST['sys']; 
+		$_SESSION['last_system']=$_POST['sys']; 
+	}
 	if (empty($_POST['suite'])) {
-		$suite = '';
+	  $_SESSION['last_suite']='';
 	} else {
-		$suite = strtoupper(($_POST["suite"]));
+	  $suite=$_POST['suite']; 
+	  $_SESSION['last_suite']=$_POST['suite']; 
+	}
+	if ((empty($_POST['job']))  and ($_POST['job'] != 0))  {
+	  $_SESSION['last_job']='';
+	} else {
+	  $job=$_POST['job']; 
+	  $_SESSION['last_job']=$_POST['job']; 
+	}
+	if ( $errormessage == '') {
+	
+		$payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\"}";
+		$response = run_web_service('job', $payload, 'GET');
+		$reply=json_decode($response,true);
+
 	};
-	$job = strtoupper(($_POST["job"]));
-
- 	$errormessage = "";
-	$payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\"}";
-	$response = run_web_service('job', $payload, 'GET');
-	$reply=json_decode($response,true);
-
 };
-
 ?>
 <form <form class="w3-container" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 <div class="w3-container w3-center "> <h2><?php echo 'List Jobs';?></h2> </div>
 <div class="w3-row-padding">
   <div class="w3-third" style="width:10%" >
-  <?php system_select(); ?>
+  <?php system_select($all=true); ?>
   </div>
   <div class="w3-third" style="width:10%">
-  <?php suite_select(); ?>
+  <?php suite_select($all=true); ?>
   </div>
   <div class="w3-third" style="width:10%">
-	<input type="text" style="text-transform:uppercase" class="w3-input " maxlength="10"id="job" name="job" value="<?php echo $job?>" placeholder="JOB" >
+	<input type="number"  class="w3-input " maxlength="6"id="job" name="job" value="<?php echo $_SESSION['last_job']?>" placeholder="JOB" >
  </div>
 
   <div class="w3-third" style="width:10%" >
@@ -91,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  // TODO Standardise response handling from web services
  if ($reply[1]['http_reply']['http_code'] != 200) {
 //			echo  'aaa'   ;
-			$reply['system_message'];
+			echo'<tr> No jobs matching supplied criteria</tr>';
 		} else {
 			foreach ($reply[0] as $job) {
 

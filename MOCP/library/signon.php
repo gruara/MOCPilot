@@ -1,9 +1,4 @@
-<?php 
-session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-?>
+
 <html>
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/MOCP/templates/heading.inc.php'; ?>
@@ -25,6 +20,9 @@ $uname = $password = "";
 $errors = false;
 $_SESSION["user_id"] = '';
 $_SESSION["token"] = '';
+$_SESSION["last_system"]='';
+$_SESSION["last_suite"]='';
+$_SESSION["last_job"]='';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (empty($_POST["uname"])) {

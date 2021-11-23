@@ -6,10 +6,10 @@
         db user : awg
         db password : iolabr0n
         host: localhost
-      Web_services:
+      Web Services:
         name : MOCPilot
         version : v1.0
-        common_url: http://192.168.68.133:80/api/
+        common url: http://192.168.68.133:80/api
       Timers:
         schedular sleep time : 600 # seconds
         controller sleep time : 60 # seconds
@@ -30,10 +30,10 @@
         db user : awg
         db password : iolabr0n
         host: localhost
-      Web_services:
+      Web Services:
         name : MOCPilot
         version : v1.0
-        common_url: http://192.168.68.133:80/api/
+        common url: http://192.168.68.133:80/api
       Timers:
         schedular sleep time : 600 # seconds
         controller sleep time : 60 # seconds

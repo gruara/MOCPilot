@@ -1,3 +1,13 @@
+<?php 
+session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+if ( !isset( $_SESSION['user_id'])) {
+  header('Location: /MOCP/library/signon.php');
+  ob_flush();
+}
+?>
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 
