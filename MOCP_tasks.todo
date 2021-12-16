@@ -6,11 +6,15 @@ MOC_Pilot:
         ✔ Tighten System, Suite and Job validation when adding job Dependency @done (23/11/2021, 22:32:35)
         ✔ Display selected field on repost @done (23/11/2021, 22:32:52)
         ✔ Move logging configuration to yaml @done (15/11/2021, 18:54:10)
+        ☐ List log entries
+        ✔ Multiple jobs with same id not working @done (16/12/2021, 11:54:45)
+           
     Job Monitor:
         ✔ Add schedule time @done (13/11/2021, 21:33:07)
         ☐ add job override
-        ☐ add job expediate
-        ☐ refresh schedule date
+        ✔ add job expediate @done (05/12/2021, 10:31:41)
+        ✔ refresh schedule date @done (02/12/2021, 09:25:33)
+        ✔ Record time of status change @done (16/12/2021, 11:55:49)
     Insert Job Dependency:
         ☐ Check both jobs exist
     Job Runner:
@@ -18,9 +22,12 @@ MOC_Pilot:
     Update Schedule Job:
         ☐ Change validation
     Schedular:
-        ☐ Real time scheduling
+        ✔ Real time scheduling @done (02/12/2021, 09:25:55)
     System information:
         ☐ Add yaml data
-
+    Web Services:
+        ☐ Insert job_schedule - allow multiple inputs
+    Job Controller:
+        ☐ Improve file dependency
 
 

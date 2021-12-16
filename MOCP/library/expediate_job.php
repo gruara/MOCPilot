@@ -52,27 +52,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	} else {
 		$schedule_date = $_POST['schedule_date'];
 	}
-	if (empty($_POST['status'])) {
+	if (empty($_POST['yn'])) {
 		$errormessage = 'All values must be supplied';
 
 	} else {
-		$status = $_POST['status'];
+		$override_dependencies = $_POST['yn'];
 	}
     if ($errormessage == '') {
-        $payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\",\"schedule_date\" : \"{$schedule_date}\",\"status\" : \"{$status}\",\"schedule_time\" : \"\"}";
+        if ($override_dependencies == 'YES') {
+           $status='RQ';
+        } else {
+           $status='SQ';
+        }
+        $schedule_time=date("H:i:s");
+        $payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\",\"schedule_date\" : \"{$schedule_date}\",\"status\" : \"{$status}\",\"schedule_time\" : \"{$schedule_time}\"}";
         $response = run_web_service('schedule_job', $payload, 'PUT');
 	    $reply=json_decode($response,true);
 	
  
 		if ($reply[1]['http_reply']['http_code'] == 200) {
-			$errormessage = "Status updated";
+			$errormessage = "Job expediated";
 		} else {	
-			$errormessage = 'Updated failed or status already set';
+			$errormessage = 'Updated failed';
 		} 
 	}
 }
 ?>
-<div class="w3-container w3-center "> <h2><?php echo 'Update Schedule Job Status';?></h2> </div>
+<div class="w3-container w3-center "> <h2><?php echo 'Expediate Job';?></h2> </div>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
   <table class="w3-table  w3-border w3-container w3-center w3-left-align w3-small" style="width:50%">
     <tr>    
@@ -96,8 +102,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	</tr>
 	<tr>
-		<td><label>New Status</label></td>
-		<td><?php status_select(); ?></td>
+		<td><label>Override dependencies</label></td>
+		<td><?php yes_no(); ?></td>
 	</tr>
 	<tr><td  colspan="2" style="color:red;font-weight:bold"> <?php echo $errormessage?></td></tr>
   </table>

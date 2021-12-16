@@ -104,10 +104,10 @@ def get_schedule_date():
         else:
             return 'Not defined'
 
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+"""     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
                                   host='localhost',
-                                  database='MOCpilot')
+                                  database='MOCpilot') """
                                   
 def insert_log_entry(entry, user, token):
 

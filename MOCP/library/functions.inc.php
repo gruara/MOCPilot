@@ -45,7 +45,7 @@ function get_schedule_date() {
 
 function system_select($all=false) {
   
-  $systems=array("CRED","PI","SYSTEM");
+  $systems=array("CRED","MOCP","PI","SYSTEM");
   
   echo '<select class="w3-select"  name="sys",id="system">';
   echo '<option value="" disabled>System</option>';
@@ -66,7 +66,7 @@ function system_select($all=false) {
 }
 
 function suite_select($all=false) {
-  $suites=array("ADHOC", "DAY", "TP", "WEEK");
+  $suites=array("ADHOC", "DAY", "MOCP", "TP", "WEEK");
   echo '<select class="w3-select"  name="suite",id="suite">';
   echo  '<option value="" disabled>Suite</option>';
   if ($all) {
@@ -112,6 +112,16 @@ function dep_suite_select() {
           <option value="DAY"> DAY </option>
           <option value="TP"> TP </option>
           <option value="WEEK"> WEEK </option>
+      </select>';
+
+}
+
+function yes_no() {
+  echo '<select class="w3-select"  name="yn",id="yn">
+       
+          <option value="YES" > YES </option>
+          <option value="NO"> NO </option>
+
       </select>';
 
 }

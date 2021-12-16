@@ -18,7 +18,7 @@
 
 </form>
 <div>
-<?php //echo "Gabba Gabba hey " . $_SESSION["token"];?>
+<?php 	$_SESSION['schedule_date'] = get_schedule_date();?>
 </div>
 <div id="tableholder"></div> 
 <script>

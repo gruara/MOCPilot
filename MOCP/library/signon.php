@@ -23,6 +23,9 @@ $_SESSION["token"] = '';
 $_SESSION["last_system"]='';
 $_SESSION["last_suite"]='';
 $_SESSION["last_job"]='';
+$_SESSION["last_schedule_date"]='';
+$_SESSION["last_schedule_time"]='';
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (empty($_POST["uname"])) {
@@ -54,6 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$_SESSION["user_id"] = $uname;
 			$_SESSION["token"] = $reply[0]['token'];
 			$_SESSION['schedule_date'] = get_schedule_date();
+      
 		  header('Location: /MOCP/library/frontpage.php');
 			ob_flush();
 			exit;

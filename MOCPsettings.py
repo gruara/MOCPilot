@@ -14,8 +14,9 @@ config=yaml_in['Environments'][env]
 DB_USER=config['DB']['db user']
 DB_PASSWORD=config['DB']['db password']
 
-system_user_id=''
-system_token=''
+schedule_start_time=config['Various']['schedule day start']
+system_user_id=config['Various']['system user']
+system_token=config['Various']['system token']
 
 maximum_concurrency=config['Various']['maximum concurrency']
 
@@ -34,6 +35,6 @@ LOGGING_FILE_SCHEDULAR=config['Logging']['schedular log filename']
 LOGGING_FILE_COTROLLER=config['Logging']['controller log filename']
 LOGGING_FILE_RUNNER=config['Logging']['runner log filename']
 
-WEB_SERVICE_URL='{}/{}/{}/'.format(config['Web Services']['common url'],config['Web Services']['verion'],config['Web Services']['name'])
+WEB_SERVICE_URL='{}/{}/{}/'.format(config['Web Services']['common url'],config['Web Services']['version'],config['Web Services']['name'])
     
 

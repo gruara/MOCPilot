@@ -24,6 +24,9 @@
         runner log filename : /home/pi/log/MOCP_Job_Runner.log
       Various:
         maximum concurrency : 6
+        schedule day start : 06:00:00
+        system user : system@mocp.com
+        system token : 2f4d1e25-4483-478d-8072-0fcd575feac0
   Live:
       DB: 
         name: MOCPilot
@@ -48,3 +51,6 @@
         runner log filename : /home/pi/log/MOCP_Job_Runner.log
       Various:
         maximum concurrency : 6
+        schedule day start : 06:00
+        system user : system@mocp.com
+        system token : 2f4d1e25-4483-478d-8072-0fcd575feac0

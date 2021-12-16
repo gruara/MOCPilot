@@ -19,7 +19,8 @@
 $system='';
 $suite='';
 $job='';
-$schedule_date=$_SESSION['schedule_date'];
+$schedule_date=$_SESSION['last_schedule_date'];
+$schedule_time=$_SESSION['last_schedule_time'];
 $status='RQ';
 $date_validate="(?:19|20)\[0-9\]{2}-(?:(?:0\[1-9\]|1\[0-2\])-(?:0\[1-9\]|1\[0-9\]|2\[0-9\])|(?:(?!02)(?:0\[1-9\]|1\[0-2\])-(?:30))|(?:(?:0\[13578\]|1\[02\])-31))" ;
 $errormessage='';
@@ -51,28 +52,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$errormessage = 'All values must be supplied';
 	} else {
 		$schedule_date = $_POST['schedule_date'];
+        $_SESSION['last_schedule_date'] = $_POST['schedule_date'];
 	}
-	if (empty($_POST['status'])) {
-		$errormessage = 'All values must be supplied';
+    if (empty($_POST['schedule_time'])) {
 
+		$errormessage="Field must be supplied!";
 	} else {
-		$status = $_POST['status'];
-	}
+		$schedule_time = strtoupper(($_POST["schedule_time"]));
+        $_SESSION['last_schedule_time'] = $_POST['schedule_time'];
+    }
     if ($errormessage == '') {
-        $payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\",\"schedule_date\" : \"{$schedule_date}\",\"status\" : \"{$status}\",\"schedule_time\" : \"\"}";
-        $response = run_web_service('schedule_job', $payload, 'PUT');
+
+
+        $payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",	\"job\" : \"{$job}\"}";
+        $response = run_web_service('job', $payload, 'GET');
 	    $reply=json_decode($response,true);
 	
  
 		if ($reply[1]['http_reply']['http_code'] == 200) {
-			$errormessage = "Status updated";
+            $payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",\"job\" : \"{$job}\",\"status\" : \"SQ\", \"schedule_date\" : \"{$schedule_date}\",\"schedule_time\" : \"{$schedule_time}\"}";
+            $response = run_web_service('schedule_job', $payload, 'POST');
+            $reply=json_decode($response,true);
+            if ($reply[1]['http_reply']['http_code'] == 201) {
+				$payload = "{ \"system\" : \"{$system }\", \"suite\" : \"{$suite}\",\"job\" : \"{$job}\",\"job_id\" : 0,\"schedule_status\" : \"SQ\", \"schedule_date\" : \"{$schedule_date}\",\"action\" : \"Manually added to schedule\"}";
+            	$response = run_web_service('log', $payload, 'POST');
+                $errormessage = "Job inserted";
+            } else {	
+                $errormessage = "Insert failed";
+            } 
 		} else {	
-			$errormessage = 'Updated failed or status already set';
+			$errormessage = 'Unable to get job details';
 		} 
 	}
 }
 ?>
-<div class="w3-container w3-center "> <h2><?php echo 'Update Schedule Job Status';?></h2> </div>
+<div class="w3-container w3-center "> <h2><?php echo 'Add Job to Schedule';?></h2> </div>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
   <table class="w3-table  w3-border w3-container w3-center w3-left-align w3-small" style="width:50%">
     <tr>    
@@ -89,15 +103,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		<td><label>Job</label></td>
 		<td><input type="number" class="w3-input " maxlength="6" id="job" name="job" value="<?php echo $job?>"></td>
 	</tr>
-		<tr>
+    <tr>
 		<td><label>Schedule Date</label></td>
 <!--		<td><input type="text" class="w3-input " pattern="<?php echo $date_validate ?>" title = 'Date in YYYY-MM-DD format' maxlength="6" id="schedule_date" name="schedule_date" value="<?php echo $schedule_date?>"></td>-->
-		<td><input type="text" class="w3-input " maxlength="6" id="schedule_date" name="schedule_date" value="<?php echo $schedule_date?>"></td>
+		<td><input type="text" class="w3-input " maxlength="10" id="schedule_date" name="schedule_date" value="<?php echo $schedule_date?>"></td>
 
 	</tr>
-	<tr>
-		<td><label>New Status</label></td>
-		<td><?php status_select(); ?></td>
+    <tr>
+		<td><label>Schedule Time</label></td>
+		<td><input type="text"  class="w3-input " maxlength="10" id="schedule_time" name="schedule_time" value="<?php echo $schedule_time?>"></td>
+
 	</tr>
 	<tr><td  colspan="2" style="color:red;font-weight:bold"> <?php echo $errormessage?></td></tr>
   </table>

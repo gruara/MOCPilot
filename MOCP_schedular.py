@@ -33,10 +33,10 @@ def schedule_info():
     if schedule_date == 'Not defined':
         print('Schedule date not defined')
         sys.exit(1)
-    print('Schedule date = {}'.format(schedule_date))
+    #print('Schedule date = {}'.format(schedule_date))
 
     properties=date_properties( schedule_date)
-    print(properties)
+    #print(properties)
 
     logger.info('Schedular Starting')
     logger.info('Schedule date = {}'.format(schedule_date))
