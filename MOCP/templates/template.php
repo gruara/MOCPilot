@@ -23,7 +23,7 @@ include '/MOCP/templates/template.php';
 
 <tr >
   <td width=100% valign=middle >
-  <h1>MOC Pilot</h1>
+  <h1>MOC <?php print $_SESSION["suite"] ?></h1>
   <h2>Where Miserable Old Cnuts come to die</h2>
   </td>
  </tr>

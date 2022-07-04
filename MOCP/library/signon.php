@@ -25,6 +25,7 @@ $_SESSION["last_suite"]='';
 $_SESSION["last_job"]='';
 $_SESSION["last_schedule_date"]='';
 $_SESSION["last_schedule_time"]='';
+$_SESSION["suite"]='Systems'; 
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -58,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$_SESSION["token"] = $reply[0]['token'];
 			$_SESSION['schedule_date'] = get_schedule_date();
       
-		  header('Location: /MOCP/library/frontpage.php');
+		  header('Location: /MOCP/library/system_select.php');
 			ob_flush();
 			exit;
 	  }
