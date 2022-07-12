@@ -20,6 +20,389 @@ app = Flask("MOCP_web_services")
 
 token = ''
 
+@app.route("/chart", methods=['GET'])
+def get_chart():
+    logger.debug('Get Chart')
+    sys_message = 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCcharts')
+
+    if not authorised():
+        sys_message = 'Invalid token or token expired'
+        response = 403
+    else:
+        req_payload = request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            chart_id = req_payload.get('chart_id')
+
+            sql = """SELECT position, 
+                            artist, 
+                            song,
+                            previous_week,
+                            weeks_on_chart,
+                            highest
+
+                FROM mocc_chart_entry
+                WHERE chart_id = '{}'
+                ORDER BY position""".format(chart_id)
+            
+            try:
+                mycursor = cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message = 'No records with given criteria'
+                    response = 404
+                else:
+
+                    recs = mycursor.fetchall()
+                    payload = []
+                    for position, artist, song, previous_week, weeks_on_chart, highest in recs:
+
+                        job_dict = {'position': position,
+                                    'artist': artist,
+                                    'song': song,
+                                    'previous_week': previous_week,
+                                    'weeks_on_chart': weeks_on_chart,
+                                    'highest': highest}
+
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200
+                    reply = {'http_reply': {
+                        'http_code': 200,
+                        'http_message': 'Success',
+                        'system_message': sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    return_payload = {}
+    reply = response_message(response, sys_message)
+    return jsonify(return_payload, reply), response
+
+@app.route("/chart_artist", methods=['GET'])
+def get_chart_artist():
+    logger.debug('Get Chart Artist')
+    sys_message = 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCcharts')
+
+    if not authorised():
+        sys_message = 'Invalid token or token expired'
+        response = 403
+    else:
+        req_payload = request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            artist = req_payload.get('artist')
+            exact = req_payload.get('exact')
+            if exact != 'true':
+                artist = '%' + artist + '%'
+                
+            sql = """SELECT  DISTINCT `song`,
+                                     `artist`
+
+                FROM mocc_chart_entry
+                WHERE artist LIKE \"{}\"""".format(artist)
+            try:
+                mycursor = cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message = 'No records with given criteria'
+                    response = 404
+                else:
+
+                    recs = mycursor.fetchall()
+                    payload = []
+                    for artist, song in recs:
+
+                        job_dict = {'song': artist,
+                                    'artist': song}
+
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200
+                    reply = {'http_reply': {
+                        'http_code': 200,
+                        'http_message': 'Success',
+                        'system_message': sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    return_payload = {}
+    reply = response_message(response, sys_message)
+    return jsonify(return_payload, reply), response
+
+@app.route("/chart_date", methods=['GET'])
+def get_chart_date():
+    logger.debug('Get Chart Date')
+    sys_message = 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCcharts')
+
+    if not authorised():
+        sys_message = 'Invalid token or token expired'
+        response = 403
+    else:
+        req_payload = request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            chart_id = req_payload.get('chart_id')
+            chart_date = req_payload.get('chart_date')
+            sql = """SELECT chart_id, 
+                            date_from, 
+                            date_to
+
+                FROM mocc_chart_dates
+                WHERE chart_id = '{}'""".format(chart_id)
+               
+            try:
+                mycursor = cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message = 'No records with given criteria'
+                    response = 404
+                else:
+
+                    recs = mycursor.fetchall()
+                    payload = []
+                    for chart_id, date_from, date_to in recs:
+
+                        job_dict = {'chart_id': chart_id,
+                                    'date_from': date_from,
+                                    'date_to': date_to}
+                                   
+
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200
+                    reply = {'http_reply': {
+                        'http_code': 200,
+                        'http_message': 'Success',
+                        'system_message': sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    return_payload = {}
+    reply = response_message(response, sys_message)
+    return jsonify(return_payload)
+
+@app.route("/chart_id", methods=['GET'])
+
+def get_chart_id():
+    logger.debug('Get Chart ID')
+    sys_message = 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCcharts')
+
+    if not authorised():
+        sys_message = 'Invalid token or token expired'
+        response = 403
+    else:
+        req_payload = request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+
+            chart_date = req_payload.get('chart_date')
+            sql = """SELECT chart_id, 
+                            date_from, 
+                            date_to
+
+                FROM mocc_chart_dates
+                WHERE date_from <= '{}' AND 
+                      date_to >= '{}' """.format(chart_date, chart_date)
+               
+            try:
+                mycursor = cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message = 'No records with given criteria'
+                    response = 404
+                else:
+
+                    recs = mycursor.fetchall()
+                    payload = []
+                    for chart_id, date_from, date_to in recs:
+
+                        job_dict = {'chart_id': chart_id,
+                                    'date_from': date_from,
+                                    'date_to': date_to}
+                                   
+
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200
+                    reply = {'http_reply': {
+                        'http_code': 200,
+                        'http_message': 'Success',
+                        'system_message': sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    return_payload = {}
+    reply = response_message(response, sys_message)
+    return jsonify(return_payload, reply), response
+
+@app.route("/chart_song_details", methods=['GET'])
+def get_chart_song_details():
+    logger.debug('Get Chart Song Details')
+    sys_message = 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCcharts')
+
+    if not authorised():
+        sys_message = 'Invalid token or token expired'
+        response = 403
+    else:
+        req_payload = request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            artist = req_payload.get('artist')
+            song = req_payload.get('song')
+            sql = """ SELECT `artist`,
+                             `song`,
+                             `chart_date`,
+                             `position`
+
+                FROM mocc_chart_entry
+                WHERE artist = \"{}\" AND
+                      song = \"{}\"""".format(artist, song)
+            try:
+                mycursor = cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message = 'No records with given criteria'
+                    response = 404
+                else:
+
+                    recs = mycursor.fetchall()
+                    payload = []
+                    for artist, song, chart_date, position in recs:
+
+                        job_dict = {'song': artist,
+                                    'artist': song,
+                                    'chart_date' : chart_date,
+                                    'position' : position}
+
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200
+                    reply = {'http_reply': {
+                        'http_code': 200,
+                        'http_message': 'Success',
+                        'system_message': sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    return_payload = {}
+    reply = response_message(response, sys_message)
+    return jsonify(return_payload, reply), response   
+
+@app.route("/chart_song_summary", methods=['GET'])
+def get_chart_song_summary():
+    logger.debug('Get Chart Song Summary')
+    sys_message = 'None'
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  host='localhost',
+                                  database='MOCcharts')
+
+    if not authorised():
+        sys_message = 'Invalid token or token expired'
+        response = 403
+    else:
+        req_payload = request.get_json()
+        if not req_payload:
+            response = 400
+        else:
+            artist = req_payload.get('artist')
+            song = req_payload.get('song')
+            sql = """ SELECT  date_format(min(chart_date),'%d-%m-%Y') as earliest_date, 
+                              date_format(max(chart_date),'%d-%m-%Y') as latest_date,
+                              min(position) as highest_position,
+                              count(position) as weeks_on_charts
+
+                FROM mocc_chart_entry
+                WHERE artist = \"{}\" AND
+                      song = \"{}\"""".format(artist, song)
+            try:
+                mycursor = cnx.cursor()
+
+                mycursor.execute(sql)
+            except mysql.connector.Error as err:
+                logger.error(sql)
+                logger.error(err)
+                response = 500
+            else:
+                if mycursor.rowcount == 0:
+                    sys_message = 'No records with given criteria'
+                    response = 404
+                else:
+
+                    recs = mycursor.fetchall()
+                    payload = []
+                    for earliest_date, latest_date, highest_position, weeks_on_chart in recs:
+
+                        job_dict = {'song': artist,
+                                    'artist': song,
+                                    'earliest_date': earliest_date,
+                                    'latest_date' : latest_date,
+                                    'highest_position' : highest_position,
+                                    'weeks_on_chart' : weeks_on_chart
+                                    }
+
+                        payload.append(job_dict)
+                    return_payload = payload
+                    response = 200
+                    reply = {'http_reply': {
+                        'http_code': 200,
+                        'http_message': 'Success',
+                        'system_message': sys_message}}
+                    return jsonify(return_payload, reply), response
+    cnx.commit()
+    return_payload = {}
+    reply = response_message(response, sys_message)
+    return jsonify(return_payload, reply), response   
 
 @app.route("/file_dependency", methods=['GET'])
 def get_file_dependencies():

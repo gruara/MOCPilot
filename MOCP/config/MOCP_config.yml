@@ -9,14 +9,14 @@
       Web Services:
         name : MOCPilot
         version : v1.0
-        common url: http://192.168.68.133:80/api
+        common url: http://pi4-1:80/api
       Timers:
         schedular sleep time : 600 # seconds
         controller sleep time : 60 # seconds
         runner sleep time : 60 # seconds
         token expiry : 1440 # minutes
       Logging:
-        level : INFO
+        level : DEBUG
         format : '%(asctime)s - %(name)s - %(threadName)s %(levelname)s: %(message)s'
         web services filename : /home/pi/log/MOCP_Web_Services.log
         schedular log filename : /home/pi/log/MOCP_Schedular.log
@@ -26,7 +26,7 @@
         maximum concurrency : 6
         schedule day start : 06:00:00
         system user : system@mocp.com
-        system token : 2f4d1e25-4483-478d-8072-0fcd575feac0
+        system token : 1f60d0a3-97aa-4509-9c57-a630024d07b3
   Live:
       DB: 
         name: MOCPilot
@@ -36,7 +36,7 @@
       Web Services:
         name : MOCPilot
         version : v1.0
-        common url: http://192.168.68.133:80/api
+        common url: http://pi4-1:80/api
       Timers:
         schedular sleep time : 600 # seconds
         controller sleep time : 60 # seconds

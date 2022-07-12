@@ -29,5 +29,10 @@ MOC_Pilot:
         ☐ Insert job_schedule - allow multiple inputs
     Job Controller:
         ☐ Improve file dependency
+MOC_Charts:
+    Artist:
+        ☐ Tidy layout
+        ☐ Redisplay entered after entry
 
 
+ 

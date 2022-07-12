@@ -15,7 +15,7 @@ $_SESSION["suite"]='Systems';
 <tr>
 <td></td>
 <td style="width:30%"><h1>MOC Charts </h1></td>
-<td class="w3-panel w3-padding-16"><a href="/MOCP/library/charts.php"><button class="w3-button w3-white w3-border w3-border-red w3-round-large">Go</button></a></td>
+<td class="w3-panel w3-padding-16"><a href="/MOCP/library/charts_random.php"><button class="w3-button w3-white w3-border w3-border-red w3-round-large">Go</button></a></td>
 </tr>
 
 </table></div>
