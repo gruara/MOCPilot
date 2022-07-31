@@ -43,6 +43,7 @@ def process():
 
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
+                                  charset='utf8',
                                   host='localhost',
                                   database='MOCpilot')
 

@@ -3,7 +3,7 @@
 
 function run_web_service($service, $payload, $method) {
   $curl = curl_init();
-  $url = 'http://192.168.68.133:80/api/v1.0/MOCPilot/' . $service;
+  $url = 'http://pi4-1:80/api/v1.0/MOCPilot/' . $service;
 
   curl_setopt_array($curl, array(
     CURLOPT_URL => $url,

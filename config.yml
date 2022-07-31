@@ -1,0 +1,7 @@
+---
+  Computer:
+    Name : raspberrypi
+  
+  Service : 
+    config : '/var/www/html/MOCP/config/MOCP_config.yml'
+    environment : Test

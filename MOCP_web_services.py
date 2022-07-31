@@ -24,10 +24,7 @@ token = ''
 def get_chart():
     logger.debug('Get Chart')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCcharts')
+    cnx = db_connect('MOCcharts')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -92,10 +89,7 @@ def get_chart():
 def get_chart_artist():
     logger.debug('Get Chart Artist')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCcharts')
+    cnx = db_connect('MOCcharts')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -153,10 +147,7 @@ def get_chart_artist():
 def get_chart_date():
     logger.debug('Get Chart Date')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCcharts')
+    cnx = db_connect('MOCcharts')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -216,10 +207,7 @@ def get_chart_date():
 def get_chart_id():
     logger.debug('Get Chart ID')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCcharts')
+    cnx = db_connect('MOCcharts')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -279,10 +267,7 @@ def get_chart_id():
 def get_chart_song_details():
     logger.debug('Get Chart Song Details')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCcharts')
+    cnx = db_connect('MOCcharts')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -342,10 +327,7 @@ def get_chart_song_details():
 def get_chart_song_summary():
     logger.debug('Get Chart Song Summary')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCcharts')
+    cnx = db_connect('MOCcharts')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -408,10 +390,7 @@ def get_chart_song_summary():
 def get_file_dependencies():
     logger.debug('Get File Dependencies')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -483,10 +462,7 @@ def get_file_dependencies():
 def get_jobs():
     logger.debug('Get Jobs')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -572,10 +548,7 @@ def get_jobs():
 def insert_jobs():
     logger.debug('Insert Jobs')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -642,10 +615,7 @@ def insert_jobs():
 def update_job():
     logger.debug('Update Job')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
     if not authorised():
         sys_message = 'Invalid token or token expired'
         response = 403
@@ -716,10 +686,7 @@ def update_job():
 def get_job_dependencies():
     logger.debug('Get Job Dependencies')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -794,10 +761,7 @@ def get_job_dependencies():
 def insert_job_dependency():
     logger.debug('Insert Job Dependencies')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -858,10 +822,7 @@ def get_log_entries():
     logger.debug('Get Log Entries')
 
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -947,10 +908,7 @@ def get_log_entries():
 def insert_log():
     logger.debug('Insert log')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -1003,10 +961,7 @@ def insert_log():
 def get_schedule_date():
     #    logger.debug('Get Schedule date')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     mycursor = cnx.cursor()
     sql = """SELECT * FROM `mocp_schedule` WHERE 1"""
@@ -1045,10 +1000,7 @@ def get_schedule_date():
 def update_schedule_date():
     logger.debug('Update Schedule Date')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
     if not authorised():
         sys_message = 'Invalid token or token expired'
         response = 403
@@ -1088,10 +1040,7 @@ def update_schedule_date():
 def get_schedule_jobs():
     logger.debug('Get Schedule Jobs')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -1175,10 +1124,7 @@ def get_schedule_jobs():
 def insert_schedule_job():
     logger.debug('Insert schedule job')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -1231,10 +1177,7 @@ def insert_schedule_job():
 def update_schedule_job():
     logger.debug('Update Schedule Job Status')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -1312,10 +1255,7 @@ def update_schedule_job():
 def get_sys_info():
     logger.debug('Get System Information')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -1416,10 +1356,7 @@ def login():
 
 def login_user(user, password):
     global token
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     mycursor = cnx.cursor()
 
@@ -1463,10 +1400,7 @@ def login_user(user, password):
 
 def change_password(user, password, new_password):
     global token
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     mycursor = cnx.cursor()
 
@@ -1524,10 +1458,7 @@ def change_password(user, password, new_password):
 def new_user():
     logger.debug('Insert user')
     sys_message = 'None'
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     if not authorised():
         sys_message = 'Invalid token or token expired'
@@ -1629,10 +1560,7 @@ def authorised():
     if not user or not in_token:
         logger.debug("No user or token")
         return False
-    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
-                                  password=MOCPsettings.DB_PASSWORD,
-                                  host='localhost',
-                                  database='MOCpilot')
+    cnx = db_connect('MOCpilot')
 
     mycursor = cnx.cursor()
 
@@ -1661,3 +1589,11 @@ def authorised():
         return False
 
     return True
+ 
+def db_connect(db):
+    cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
+                                  password=MOCPsettings.DB_PASSWORD,
+                                  charset='utf8',
+                                  host='localhost',
+                                  database=db)
+    return cnx

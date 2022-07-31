@@ -30,6 +30,10 @@ MOC_Pilot:
     Job Controller:
         ☐ Improve file dependency
 MOC_Charts:
+    General:
+        ☐ Remove re-entry year eg {1984} from titles
+        ☐ Improve 'back' behavior
+        ☐ Change of names 'Beatles' to The Beatles
     Artist:
         ☐ Tidy layout
         ☐ Redisplay entered after entry

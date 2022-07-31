@@ -11,10 +11,10 @@ def main():
     
     result=random.randint(0,9)
 
-    if result > 8:
-        exit(result)
-    else:
-        exit(0)
+    # if result > 8:
+    #     exit(result)
+    # else:
+    exit(0)
 
 
 if __name__ == "__main__":

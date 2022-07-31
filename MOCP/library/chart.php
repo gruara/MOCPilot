@@ -2,6 +2,7 @@
 <?php 
    session_start();
    $_SESSION["suite"]='Charts'; 
+   $_SESSION['last_chart_date']="";
    $errormessage='';
     $errors=false;
 ?>
@@ -17,10 +18,10 @@
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($_POST['chart_date']))  {
-        $_SESSION['last_chart_date']='';
+          $_SESSION['last_chart_date']='';
         } else {
-        $chart_date=$_POST['chart_date']; 
-        $_SESSION['last_chart_date']=$_POST['chart_date'];
+          $chart_date=$_POST['chart_date']; 
+          $_SESSION['last_chart_date']=$_POST['chart_date'];
         }
 
         $payload = "{ \"chart_date\" : \"$chart_date\" }";
@@ -70,7 +71,7 @@
 
 				echo "<tr margin='none'>
 					   <td> {$job['position']} </td>
-					   <td> {$job['artist']} </td>
+					   <td> <a href=chart_artist_direct.php?artist=".urlencode($job['artist']).">{$job['artist']} </a></td>
 					   <td> {$job['song']} </td>
 					   <td> {$job['previous_week']} </td>
 					   <td> {$job['weeks_on_chart']} </td>

@@ -18,7 +18,7 @@ def main():
     date = date + timedelta(days=1)
     modified_date = datetime.strftime(date, "%Y-%m-%d")
 
-    url='http://192.168.68.133:80/api/v1.0/MOCPilot/schedule_date'
+    url='http://pi4-1/api/v1.0/MOCPilot/schedule_date'
     headers = {'user' : MOCPsettings.system_user_id,
                'token' : MOCPsettings.system_token}
 

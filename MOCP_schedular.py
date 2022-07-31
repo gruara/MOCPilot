@@ -31,7 +31,7 @@ def schedule_info():
     global schedule_date, properties
     schedule_date=get_schedule_date()
     if schedule_date == 'Not defined':
-        print('Schedule date not defined')
+        logger.warn('Schedule date not defined')
         sys.exit(1)
     #print('Schedule date = {}'.format(schedule_date))
 
@@ -49,6 +49,7 @@ def process():
     global schedule_date, properties
     cnx = mysql.connector.connect(user=MOCPsettings.DB_USER,
                                   password=MOCPsettings.DB_PASSWORD,
+                                  charset='utf8',
                                   host='localhost',
                                   database='MOCpilot')
     logger.info('Updating Schedule')

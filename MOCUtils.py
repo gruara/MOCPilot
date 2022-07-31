@@ -88,7 +88,7 @@ def date_properties(date):
     
 def get_schedule_date():
 
-    url = 'http://192.168.68.133:80/api/v1.0/MOCPilot/schedule_date'
+    url = 'http://pi4-1:80/api/v1.0/MOCPilot/schedule_date'
 
      
     try:
@@ -111,7 +111,7 @@ def get_schedule_date():
                                   
 def insert_log_entry(entry, user, token):
 
-    url='http://192.168.68.133:5000/api/v1.0/MOCP/log'
+    url='http://pi4-1:5000/api/v1.0/MOCP/log'
     headers = {'user_id' : user,
                'token' : token}
 

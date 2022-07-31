@@ -1,0 +1,39 @@
+sudo apt update
+sudo apt full-upgrade
+sudo apt update
+sudo apt upgrade
+sudo apt-get install apache2 -y
+sudo apt-get install php -y
+sudo apt-get install mariadb-server php-mysql -y
+sudo service apache2 restart
+sudo mysql_secure_installation
+sudo apt install phpmyadmin
+mysql -u root -piolabr0n < database_dump20220729.sql
+
+sudo pip install --system mysql.connector-python==8.0.28  NOT pip install mysql-connector-python  --- this only installs for current user
+                                                          default verion 8.0.30 does not work
+sudo pip install --system pyyaml
+
+
+sudo mkdir /var/www/MOCPilot
+sudo chown pi /var/www/MOCPilot 
+
+sudo mkdir /etc/MOC
+sudo chown pi /etc/MOC
+
+sudo chown pi /var/www
+sudo chown pi /var/www/html
+mkdir /home/pi/log
+chmod 777 /home/pi/log
+
+sudo a2ensite MOCP.conf
+
+
+sudo apt-get install python3-pip apache2 libapache2-mod-wsgi-py3
+
+
+USEFUL
+sudo -u pi python3 -m site   ---- lists loading list for python for user pi, replace pi with www-data for loading list for apache2
+sudo hostnamectl set-hostname pi4-1 --- change hostname, also check /etc/hosts
+
+might need to clear server from C:\Users\andre\.ssh\known_hosts
